@@ -125,6 +125,8 @@ int keypad_poll( void );
 void keypad_init( void );
 void keypad_set_leds( uint16_t mask );
 char keypad_stop_pressed( void );
+extern void keypadSet_Pressure_state( void);
+extern void keypadSet_Speed_state( void);
 #define leds_on()	do { PORTD &= ~(1 << 5); } while(0)
 #define leds_off()	do { PORTD |=  (1 << 5); } while(0)
 

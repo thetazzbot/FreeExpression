@@ -178,6 +178,18 @@ int keypad_scan( void )
 //#define LOAD_PAPER	0x4c
 //#define UNLOAD_PAPER	0x4d
 
+void 
+keypadSet_Speed_state( void )
+{
+	k_state = KEYPAD_XTRA2;
+	
+}
+void 
+keypadSet_Pressure_state( void )
+{
+	k_state = KEYPAD_XTRA1;
+	
+}
 //keypad_poll is here instead of in keypad.c due to calling of various actions like load paper, etc.
 int keypad_poll( void )
 {
@@ -194,7 +206,7 @@ int keypad_poll( void )
 		break;
 		
 		// move keys
-		// dont move if we're already moving...
+		// don't move if we're already moving...
 		case KEYPAD_MOVEUP:
 		case KEYPAD_MOVEUPLEFT:
 		case KEYPAD_MOVELEFT:
@@ -205,13 +217,23 @@ int keypad_poll( void )
 		case KEYPAD_MOVEUPRIGHT:
 		stepper_move_manual(key);
 		break;
-		//debugging the pen
+		
+		
+#ifdef DEBUG_FLASH		
 		case KEYPAD_F1:
 		flash_test();
 		break;
-		case KEYPAD_F2:
+#endif
+		case KEYPAD_1:
+		display_puts("Cutter down");
+		pen_down();
+		break;
+		
+		case KEYPAD_2:
+		display_puts("Cutter up");
 		pen_up();
 		break;
+		
 		
 		case KEYPAD_XTRA1:
 		{
@@ -232,6 +254,7 @@ int keypad_poll( void )
 		case KEYPAD_CUT:
 			k_state=key;
 			break;
+			
 		case KEYPAD_MINUS:
 			if(k_state==KEYPAD_XTRA1) { // PRESSURE SET
 				// pressure is inversely related to 1023, min pressure
@@ -243,6 +266,7 @@ int keypad_poll( void )
 				timer_set_stepper_speed(p);
 			}
 			break;
+			
 		case KEYPAD_PLUS:
 			if(k_state==KEYPAD_XTRA1) { // PRESSURE SET
 				// pressure is inversely related to 1023, min pressure
@@ -254,6 +278,14 @@ int keypad_poll( void )
 				timer_set_stepper_speed(p);
 			}
 		break;
+		default:
+			if (key > 0 )
+			{
+				beeper_on( 2400 );
+				msleep( 30 );
+				beeper_off( );
+			}
+			break;
 			
 		
 	}
