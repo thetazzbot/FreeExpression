@@ -53,8 +53,7 @@ void setup(void)
 	hpgl_init();
 	dial_init( );
 	sei();
-	timer_set_pen_pressure(2); // medium pressure
-	timer_set_stepper_speed(6); // medium speed
+	
 	msleep(10);
 
 	usb_puts(VERSION);
@@ -71,8 +70,8 @@ int main( void )
 		if( flag_25Hz )
 		{
 			flag_25Hz = 0;
-			//02172015 - dial polling is broken for some reason, seems like a hardware issue on my expression
-			//dial_poll( );  // polls the dials and processes their state
+			
+			dial_poll( );  // polls the dials and processes their state
 			keypad_poll( ); // polls the keypad and executes functions
 		}
 		if( flag_Hz )

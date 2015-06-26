@@ -23,18 +23,17 @@
 #ifndef DIALS_H
 #define DIALS_H
 
+// Enum to declare the ADC input channel numbers
 enum
 { 
-    DIAL_SIZE,
+    DIAL_SIZE =0,		// only on some machines this is a potentiometer, most have a quadrature encoder for the RH dial
     DIAL_SPEED,
     DIAL_PRESSURE,
     MAX_DIALS
 };
 
-int dial_get_speed( void );
-int dial_get_pressure( void );
-int dial_get_size( void );
-void dial_poll( void );
-void dial_init( void );
+
+extern void dial_poll( void );
+extern void dial_init( void );
 
 #endif
