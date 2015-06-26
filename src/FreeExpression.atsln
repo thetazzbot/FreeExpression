@@ -5,8 +5,6 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "m2u8", "m2u8\m2u8.cproj", "
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "FreeExpression", "FreeExpression.cproj", "{2DB61C7E-70C7-4213-B96E-2337EC078BE2}"
 EndProject
-Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "SDCard", "SDCard\SDCard\SDCard.cproj", "{ED4ECE10-1C1B-446E-BE3F-F6B61C3AE36A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -21,10 +19,6 @@ Global
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Debug|AVR.Build.0 = Debug|AVR
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Release|AVR.ActiveCfg = Release|AVR
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Release|AVR.Build.0 = Release|AVR
-		{ED4ECE10-1C1B-446E-BE3F-F6B61C3AE36A}.Debug|AVR.ActiveCfg = Debug|AVR
-		{ED4ECE10-1C1B-446E-BE3F-F6B61C3AE36A}.Debug|AVR.Build.0 = Debug|AVR
-		{ED4ECE10-1C1B-446E-BE3F-F6B61C3AE36A}.Release|AVR.ActiveCfg = Release|AVR
-		{ED4ECE10-1C1B-446E-BE3F-F6B61C3AE36A}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
