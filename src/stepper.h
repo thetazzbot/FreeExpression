@@ -45,6 +45,8 @@ void stepper_set_pen_pressure_override(int p);
 // delay on the PWM of the pen's MOSFET port
 // 25 translates to "maximum voltage/current allowed" and
 // pushes close to 12 volts through the MOSFET to the pen's solenoid
-#define MAX_PEN_PRESSURE 500 
-#define MIN_PEN_PRESSURE 25
+#define MAX_PEN_PWM 500			// MAX PWM for stepper solenoid i.e. nearly no pressure  ~ 10Gram
+#define MIN_PEN_PWM 100			// MIN PWM for stepper solenoid i.e max pressure it can do ~ 300gram when cold, 275 gram when hot.
+#define MAX_CUTTER_P_RANGES 10	// The number of pressure choices  
+#define MAX_STEPPER_SPEED_RANGES 9	// the number of speed choices
 #endif

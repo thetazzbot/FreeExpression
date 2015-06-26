@@ -119,7 +119,7 @@ volatile int phase_x = 0, phase_y = 0;
  * current pressure
  */
 
-static int pressure = MAX_PEN_PRESSURE;
+static int pressure = MAX_PEN_PWM;
 
 /*
  * experimental soft pen drop parameters
