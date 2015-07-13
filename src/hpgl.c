@@ -262,7 +262,7 @@ lolbel:
 			case '\t':	break;
 			case ',':	scratchpad[si++] = 0;
 						fx=0;
-						int ii=sscanf_P(scratchpad, PSTR("%d"), &fx);
+						sscanf_P(scratchpad, PSTR("%d"), &fx);
 						
 						si = 0;
 						pstate = STATE_Y;

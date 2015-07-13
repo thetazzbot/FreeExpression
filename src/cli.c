@@ -50,7 +50,7 @@ void cli_poll(void)
 	STEPPER_COORD dstx, dsty;
 	char c;
 	uint8_t labelchar;
-	char s[40];
+	
 	
 	while((c = (char)usb_getc())!=SERIAL_NO_DATA) {
 		int8_t cmd = hpgl_char(c, &dstx, &dsty, &labelchar);
