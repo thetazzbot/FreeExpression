@@ -3,6 +3,7 @@
  *
  * stepper X/Y/Z movement
  *
+ 		This source original developped by  https://github.com/Arlet/Freecut
  *
  * This file is part of FreeExpression.
  *
@@ -30,15 +31,14 @@ void stepper_move( int x, int y );
 void stepper_draw( int x, int y );
 void stepper_speed( int delay );
 void stepper_pressure( int pressure );
-void stepper_get_pos( int *x, int *y );
-int  stepper_queued( void );
+void stepper_home( void );
+void stepper_set_origin00(void );
 void stepper_unload_paper( void );
 void stepper_load_paper( void );
-void stepper_home();
 void pen_up();
 void pen_down();
-void stepper_move_manual(int direction);
-void stepper_set_pen_pressure_override(int p);
+void stepper_jog_manual(int direction, int dist);
+
 
 // These values are opposite of their named meaning
 // 1023 is "no pressure applied" and represents a very long

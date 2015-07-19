@@ -1,14 +1,13 @@
 /*
  * keypad.c
  *
- * Keypad is designed as a matrix with 24 cols, and 5 c. The 15 rows
- * are selected using a 16 bit shift register, with CLK/Data inputs.
+ * Keypad is designed as a matrix with 20 cols, and 5 rows. A 20 bit shift register controls the individual column bits
  * 
  * NOTE: Due to this design, if you press two (or more) keys in the same row
  * simultaneously, the the two corresponding outputs of the shift register
  * are shorted through the keys, and the CPU gets undefined results.
  * 
- * Pinout of the connector is as follows:
+ * Pin-out of the connector is as follows:
  *
  * Pin 	|  Name	| AVR  | Description
  *------+-------+------+------------
@@ -27,18 +26,9 @@
  * 13	| NC	| NC   |
  * 14	| NC	| NC   | 	
  * Key layout is straightforward: column 0 is left, column 13 is right, 
- * row 0 is top, row 4 is bottom. The grey arrow keys and CUT key are 
- * mapped in column 14:
+ * row 0 is top, row 4 is bottom. The rest of the keys are on columns 14-19 
  * 
- * Row  | Key
- *------+------
- *  0   | Right
- *  1   | Left 
- *  2   | CUT 
- *  3   | Up 
- *  4   | Down 
- * 
- * The various LEDs are also connected to the shift register outputs, 
+  * The various LEDs are also connected to the shift register outputs, 
  * and can be turned on with the LED Enable pin (0=On, 1=Off).  
  *
  * LED Layout is as follows:
@@ -50,6 +40,8 @@
  * COL8  COL9
  * 
  *
+ 		This source original developped by  https://github.com/Arlet/Freecut
+ 
  * This file is part of FreeExpression.
  *
  * https://github.com/thetazzbot/FreeExpression
@@ -80,11 +72,8 @@
 #define STOP	(1 << 0)	// PD0
 #define LEDS	(1 << 5)	// PD5
 #define DATA	(1 << 6) 	// PD6
-#define CLK	(1 << 7)	// PD7
+#define CLK		(1 << 7)	// PD7
 #define ROWS    (0x1f)		// mask for PG4-0
-
-#define MAX_COLS	24	
-#define MAX_ROWS 	5	
 
 
 #define clk_h()		do { PORTD |=  CLK;  } while(0)
@@ -93,8 +82,8 @@
 #define data_l()	do { PORTD &= ~DATA; } while(0)
 #define get_rows()	(~PING & ROWS)
 
-uint8_t keypad_state[MAX_COLS];	// current state
-uint8_t keypad_prev[MAX_COLS];  // previous state
+uint8_t keypad_state[KBD_MAX_COLS];	// current state
+uint8_t keypad_prev[KBD_MAX_COLS];  // previous state
 uint16_t leds;
 
 static int k_state=0;
@@ -105,7 +94,7 @@ static void keypad_write_cols( short val )
 {
     int i;
 
-    for( i = 0; i < MAX_COLS; i++ )
+    for( i = 0; i < KBD_MAX_COLS; i++ )
     {
         if( val < 0 ) 
 	    data_h( );
@@ -127,6 +116,7 @@ void keypad_set_leds( uint16_t mask )
 
 /*
  * return state of 'STOP' key.
+  STOP is not part of the keyboard  -- individually wired to port
  */
 char keypad_stop_pressed( void )
 {
@@ -144,30 +134,37 @@ int keypad_scan( void )
     int pressed = -1;
 
     leds_off( );		// turn off LEDs during scan
-    keypad_write_cols( ~1 );	// single zero at column 0
-    data_h( );			// shift in ones
-    for( col = 0; col < MAX_COLS; col++ )
+
+	
+	keypad_write_cols( 0);	// All bits to 0
+    data_h( );				// shift in consecutive 1's
+    for( col = 0; col < KBD_MAX_COLS; col++ )
     {
 			keypad_state[col] = get_rows( );
 			clk_h( );
 			clk_l( );
-    }
-   // keypad_write_cols( ~leds );
-   // leds_on( );	
+	    }
 
     // keyboard has been scanned, now look for pressed keys
-    for( col = 0; col < MAX_COLS; col++ )
+    for( col = 0; col < KBD_MAX_COLS; col++ )
     {
 		uint8_t diff = keypad_state[col] ^ keypad_prev[col];
 
 		if( diff )
 		{
-			for( row = 0; row < MAX_ROWS; row++ )
+
+			for( row = 0; row < KBD_MAX_ROWS; row++ )
 			{
 				uint8_t mask = 1 << row;
+				// the highest column that shows switch bit closure as a bit in the row read is the column associated with this button.
+				// we keep overwriting key pressed with readings from higher columns until the last column that shows the bit
 				if( diff & mask & keypad_state[col] )
-				pressed = row * 24 + col;
+				{
+							pressed = row * KBD_MAX_COLS + col;
+				}
 			}
+			
+
 		}
 		keypad_prev[col] = keypad_state[col];
     }
@@ -175,8 +172,6 @@ int keypad_scan( void )
 }
 
 
-//#define LOAD_PAPER	0x4c
-//#define UNLOAD_PAPER	0x4d
 
 void 
 keypadSet_Speed_state( void )
@@ -193,8 +188,10 @@ keypadSet_Pressure_state( void )
 //keypad_poll is here instead of in keypad.c due to calling of various actions like load paper, etc.
 int keypad_poll( void )
 {
+	int c;
 	int key = keypad_scan( );
 	char string[40];
+	
 	switch( key )
 	{
 		case KEYPAD_LOADMAT:
@@ -205,8 +202,15 @@ int keypad_poll( void )
 		stepper_unload_paper();
 		break;
 		
-		// move keys
-		// don't move if we're already moving...
+		case KEYPAD_RESETALL:
+		stepper_home();
+		break;
+		
+		case KEYPAD_BACKSPACE:
+		stepper_set_origin00();
+		break;
+		
+		// this jogs X and Y freely -- use to load, unload or set position for  0,0 origin
 		case KEYPAD_MOVEUP:
 		case KEYPAD_MOVEUPLEFT:
 		case KEYPAD_MOVELEFT:
@@ -215,7 +219,12 @@ int keypad_poll( void )
 		case KEYPAD_MOVEDNRIGHT:
 		case KEYPAD_MOVERIGHT:
 		case KEYPAD_MOVEUPRIGHT:
-		stepper_move_manual(key);
+		stepper_jog_manual(key,25);		// move 1/16 opf an inch each increment
+		
+		// For auto key repeat on these buttons , clear previous  kbd status[] so that a new button press registers again 
+		for(  c = 0; c < KBD_MAX_COLS; c++ )	
+	 
+			keypad_prev[c] = 0;
 		break;
 		
 		
@@ -255,7 +264,7 @@ int keypad_poll( void )
 			k_state=key;
 			break;
 			
-		case KEYPAD_MINUS:
+		case KEYPAD_MINUS:		// decrements either pressure or speed depending on what was last pressed 
 			if(k_state==KEYPAD_XTRA1) { // PRESSURE SET
 				// pressure is inversely related to 1023, min pressure
 				int p=timer_get_pen_pressure()-1;
@@ -267,7 +276,7 @@ int keypad_poll( void )
 			}
 			break;
 			
-		case KEYPAD_PLUS:
+		case KEYPAD_PLUS:		// increments either pressure or speed depending on what was last pressed 
 			if(k_state==KEYPAD_XTRA1) { // PRESSURE SET
 				// pressure is inversely related to 1023, min pressure
 				int p=timer_get_pen_pressure()+1;
@@ -279,10 +288,10 @@ int keypad_poll( void )
 			}
 		break;
 		default:
-			if (key > 0 )
+			if (key > 0 )		// if a key was pressed that is not assigned beep 
 			{
 				beeper_on( 2400 );
-				msleep( 30 );
+				msleep( 50 );
 				beeper_off( );
 			}
 			break;

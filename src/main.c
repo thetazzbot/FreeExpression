@@ -3,6 +3,7 @@
  * 
  * FreeExpression firmware, main program
  *
+ 		This source original developped by  https://github.com/Arlet/Freecut
  *
  * This file is part of FreeExpression.
  *
@@ -42,7 +43,7 @@
 
 void setup(void)
 {
-	
+	// Watchdogging disabled -- No use while debugging / testing 
 	//    wdt_enable( WDTO_30MS );
 	usb_init();
 	timer_init( );
@@ -52,12 +53,14 @@ void setup(void)
 	flash_init( );
 	hpgl_init();
 	dial_init( );
-	sei();
+		
+	sei();					// Start interrupts -- Motors will home immediately following this
 	
-	msleep(10);
-
-	usb_puts(VERSION);
+	msleep(100);
+	
 	display_println(VERSION );
+	
+	usb_puts(VERSION);
 
 }
 int main( void )
@@ -65,7 +68,7 @@ int main( void )
 	setup();
     while( 1 )
     {
-        cli_poll( ); // polls ready bytes from usb and processes them
+        cli_poll( ); // polls ready bytes from USB  and processes them
 		wdt_reset( );
 		if( flag_25Hz )
 		{

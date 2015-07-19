@@ -21,7 +21,8 @@
  * blade starting point on the mat. A small amount of negative X is allowed
  * to roll the mat out of the machine.
  *
- *
+		This source original developped by  https://github.com/Arlet/Freecut
+ 
  * This file is part of FreeExpression.
  *
  * https://github.com/thetazzbot/FreeExpression
@@ -49,13 +50,13 @@
 #include "timer.h"
 #include "display.h"
 
-#define MAT_EDGE 250			// distance to roll to load mat 
-#define MAX_Y		4800
-#define MAX_X		4800
+#define MAT_EDGE	250			// distance to roll to load mat 
+#define HOME_Y_LEAD 100		// distance to move the carriage out before homing.
+#define MAX_Y		4800		// This is the width of the carriage 4800 == 12"
+//#define MAX_X		4800		// This is the length of the cutting media, for vinyl off the roll make this as long as the var can hold (signed)
+#define MAX_X		32000		// That's 80 inches of vinyl cutting -- 	
 
-
-
-#define HOME	(1 << 1 ) // PD1, attached to 'home' push button
+#define HOME (1 << 1 ) // PD1, attached to 'home' push button
 #define PEN	(1 << 2)  // PE2, attached to pen up/down output
 
 #define at_home( ) (!(PIND & HOME))
@@ -97,7 +98,7 @@
 #define H3	0x40    // half current, coil 3 - 64 0100 0000
 #define F3	0x80    // full current, coil 3 - 128 1000 0000
 
-static uint8_t phase[] = 
+static uint8_t StepperPhaseTable[] = 
 {
     F0, F0|H1, F0|F1, H0|F1,
     F1, F1|H2, F1|F2, H1|F2,
@@ -107,25 +108,28 @@ static uint8_t phase[] =
 
 
 /* 
- * current position.
+ * current location of cutter.
  * 
+  The two variables loc_x and loc_y represent the current x/y location of the cutting tool and the lower 4 bits are directly 
+  used to look up the stepper motor drive signals via the phase table (16 micro-steps in the stepper_tick ISR.
+  This implies that loc_xand loc_y always have to increment/decrement in steps of 1 in order not execute through all the phases. 
+     
  * Initialize at left (away from home switch), and with the mat touching
  * the rollers, such that loading the mat is a simple movement to (0,0)
  */
 
-volatile int x = -MAT_EDGE, y = 4800; 
-volatile int phase_x = 0, phase_y = 0;
+static volatile int loc_x = -MAT_EDGE;
+static volatile int loc_y = -HOME_Y_LEAD;	// This is  the axis we need t home first -- negative number prohibits any movement of Y axis for cutting until homed
+static volatile int ofs_x = 0;				// Stores an offset to the absolute 0 of the X axis -- As set by the offset keyboard command
+static volatile int ofs_y = 0;				// ""
+
 /*
  * current pressure
  */
 
 static int pressure = MAX_PEN_PWM;
 
-/*
- * experimental soft pen drop parameters
- */
-int pen_time[4] = { 10, 12, 40 };
-static int pen_seq;
+
 
 static struct bresenham
 {
@@ -133,20 +137,21 @@ static struct bresenham
     int steps;			// number of steps in main direction
     int delta;			// number of steps in other direction 
     int error;			// residual error
-    int dx;			// x step direction
-    int dy;			// y step direction
+    int dx;				// x step direction
+    int dy;				// y step direction
     char steep;			// y > x
 } b;
 
-static int delay;		// delay between steps (if not 0)
+static int step_delay;		// delay between steps (if not 0)
 
 static enum state
 {
+    HOME0=0,
     HOME1,			// homing until switch is pushed
     HOME2,			// reversing until switch is released
     READY,			// motor off, pen up
     LINE			// draw straight line
-} state;
+} ActionState;
 
 /*
  * command queue. The stepper controller takes commands from the queue
@@ -158,7 +163,7 @@ static enum state
  * motion.
  */
 	
-#define CMD_QUEUE_SIZE 16	// must be power of two
+#define CMD_QUEUE_SIZE 32	// must be power of two
 
 enum type
 {
@@ -170,17 +175,51 @@ enum type
 
 struct cmd
 {
-    enum type type;		// command type,
-    int x, y; 			// target coordinates
+    enum type action_type;		// command type,
+    int x, y; 					// target coordinates
 } cmd_queue[CMD_QUEUE_SIZE];
 
 static volatile uint8_t cmd_head, cmd_tail;
 
+/* function not used */
+/*
 int stepper_queued( void )
 {
     return (char) (cmd_head - cmd_tail);
 }
+*/
 
+// Store the current position of the cutter in offset x and y.
+// Later used for positioning relative to this recorded origin
+void
+stepper_set_origin00( void)
+{
+	// if there is anything in the queue don't do it , we are in the middle of cutting possibly
+	if( cmd_head != cmd_tail ) 
+			return;
+			
+	if ( loc_x < 0 || loc_y < 0 )	// can't take negative offset, media is not loaded or not homed yet
+		return; 
+		
+	ofs_x = loc_x ;
+	ofs_y = loc_y ;
+}
+
+// Find Y home via switch and assume the unloaded media position.
+void
+stepper_home(void )
+{
+	// if there is anything in the queue don't do it , we are in the middle of cutting
+	if( cmd_head != cmd_tail )
+		return;
+	
+	pen_up( );
+	loc_y = -HOME_Y_LEAD;
+	loc_x = -MAT_EDGE;
+	
+	ActionState = HOME0;	// immediately do a home sequence
+}
+// Take stepper drivers off power -- 
 void stepper_off( void )
 {
     PORTA = 0;
@@ -190,114 +229,128 @@ void stepper_off( void )
 /*
  * allocate a new command, fill in the type, but don't put it in the queue yet.
  */
-static struct cmd *alloc_cmd( uint8_t type )
+static struct cmd *  alloc_cmd( uint8_t type )
 {
     struct cmd *cmd;
 
-    while( (uint8_t) (cmd_head - cmd_tail) >= CMD_QUEUE_SIZE )
-	wdt_reset( );
+    while( (uint8_t) (cmd_head - cmd_tail) >= CMD_QUEUE_SIZE ) 
+	{
+		wdt_reset( );
+	}
+	
     cmd = &cmd_queue[cmd_head % CMD_QUEUE_SIZE];
-    cmd->type = type;
+    cmd->action_type = type;
     return cmd;
 }
 
 /*
  * get next command from the queue (called in ISR)
  */
-static struct cmd *get_cmd( void )
+static struct cmd *  get_cmd( void )
 {
     if( cmd_head == cmd_tail )
-        return 0;
+        return NULL;
     else
         return &cmd_queue[cmd_tail++ % CMD_QUEUE_SIZE];
 }
 
 /*
- * move to coordinate (x, y) with pen lifted. We allow moving
+ * Cut to coordinate (x, y). 
+ */
+void stepper_draw( int x, int y )
+{
+    struct cmd *cmd = alloc_cmd( DRAW );		// This call blocks if the queue is full
+
+	x += ofs_x;
+	y += ofs_y;
+	
+    if( x < 0 || x > MAX_X || y < 0 || y > MAX_Y )		// don't do it if it's outside the media
+        return;
+		
+    cmd->x = x;
+    cmd->y = y;
+    cmd_head++;		// this really allocates the entry in the queue
+}
+
+
+/*
+ * move to coordinate (x, y) (with cutter up). We allow moving
  * beyond the mat so that it will roll out.
  */
 void stepper_move( int x, int y )
 {
-    struct cmd *cmd = alloc_cmd( MOVE );
+    struct cmd *cmd = alloc_cmd( MOVE );		// This call blocks if the queue is full
 
-    if( x < -MAT_EDGE || x > MAX_X || y < 0 || y > MAX_Y )
+	x += ofs_x;
+	y += ofs_y;
+
+    if( x < -MAT_EDGE || x > MAX_X || y < 0 || y > MAX_Y )	// don't do it if it's outside the media
         return;
+		
     cmd->x = x;
     cmd->y = y;
-    cmd_head++;
+    cmd_head++;		// this really allocates the entry in the queue
+}
+/*
+ * This moves the cutter/ media freely within the machines rage limits - can be used to set offsets and jog the carriage around
+ */
+static void 
+stepper_jogRelative( int x, int y )
+{
+	struct cmd *cmd = alloc_cmd( MOVE );		
+
+	x += loc_x;		// relative to the current position
+	y += loc_y;
+	
+	if( x < -MAX_X || x > MAX_X || y < 0 || y > MAX_Y )	// don't do it if it's outside the range of motion
+		return;
+	
+	cmd->x = x;
+	cmd->y = y;
+	cmd_head++;		// this really allocates the entry in the queue
 }
 
-/************************************************************************
- Experimental code to move the motors when the user presses the arrow
- keys on the keypad.  Problem currently is that it will not move beyond
- 0 on either axis. The x axis however is the mat and we should be able
- to move as far as we want to.  So, inside the stepper code we 
- will probably have to override the limits when we're moving manually
-************************************************************************/
-void stepper_move_manual(int direction)
+/* 
+ * Function to move the cutting head/media freely throughout the physical range of the machine.
+ */
+void stepper_jog_manual(int direction, int dist)
 {
-	int move_amount=50;
-	// dont move if we're already moving...
-	if( cmd_head != cmd_tail ) {
+	
+	// If there is anything in the queue don't move !! 
+	// To protect from moving while a program executes.
+	
+	if( cmd_head != cmd_tail ) 
 		return;
-	}
-	int cur_x,cur_y;
-	// move keys
-	stepper_get_pos( &cur_x,&cur_y);
-	switch(direction) {
+
+	switch(direction) 
+	{
 		case KEYPAD_MOVEUP:
-			cur_x+=move_amount;
+			stepper_jogRelative(dist,0);
 			break;
 		case KEYPAD_MOVEUPLEFT:
-			cur_x+=move_amount;
-			cur_y+=move_amount;
+			stepper_jogRelative(dist,dist);
 			break;
 		case KEYPAD_MOVELEFT:
-			cur_y+=move_amount;
+			stepper_jogRelative(0,dist);
 			break;
 		case KEYPAD_MOVEDNLEFT:
-			cur_x-=move_amount;
-			cur_y+=move_amount;
+			stepper_jogRelative(-dist,dist);
 			break;
 		case KEYPAD_MOVEDN:
-			cur_x-=move_amount;
+			stepper_jogRelative(-dist,0);
 			break;
 		case KEYPAD_MOVEDNRIGHT:
-			cur_x-=move_amount;
-			cur_y-=move_amount;
+			stepper_jogRelative(-dist,-dist);
 			break;
 		case KEYPAD_MOVERIGHT:
-			cur_y-=move_amount;
+			stepper_jogRelative(0,-dist);
 			break;
 		case KEYPAD_MOVEUPRIGHT:
-			cur_x+=move_amount;
-			cur_y-=move_amount;
+			stepper_jogRelative(dist,-dist);
 			break;
 		
 	}
-	stepper_move(cur_x,cur_y);
-	// what we need to implement is a way
-	// to re-zero after a manual move.
-	// this allows the user to manually move
-	// the pen holder into position and 
-	// start cutting from that position.
-	// HPGL commands from inkscape always
-	// start with 0,0 as the home position,
-
 	
-}
-/*
- * draw to coordinate (x, y) with pen dropped. 
- */
-void stepper_draw( int x, int y )
-{
-    struct cmd *cmd = alloc_cmd( DRAW );
-
-    if( x < 0 || x > MAX_X || y < 0 || y > MAX_Y )
-        return;
-    cmd->x = x;
-    cmd->y = y;
-    cmd_head++;
 }
 
 
@@ -309,33 +362,31 @@ void stepper_speed( int speed )
 }
 
 /*
- * loading paper. If x < 0, the mat needs to be pulled under the rollers first.
- * This is a heavy operation, so it's done at reduced speed. In all other
- * cases, just move the pen to the origin.
+ * Loading the media: The mat/media needs to be pulled under the rollers first.
  */
 void stepper_load_paper( void )
 {
-    if( x < 0 )
+	if (loc_y < 0)					// not homed yet 
+		return;
+		
+    if( loc_x < 0 )					// if media is not loaded yet
     {
-		//stepper_speed( 8 ); 	
-		stepper_move( 0, y );	// don't move Y direction yet (it may be slow)
+		loc_x = -MAT_EDGE;			// This is the distance we pull in the mat -- if origin offsets are in effect it will drive to the last recorded position
+		stepper_move( 0, loc_y );	// move media to location 0, this is the HOME point for X
+		stepper_move( 0, 0 );		// make sure Y is at zero as well -- GS: not sure why it would not be
     }
-    //stepper_speed( 8 );
-    stepper_move( 0, 0 );
 }
 
 /* 
- * unloading the paper is simple, just go to a position outside the drawing
- * area, and the mat will roll out.
+ * Unloading the media: go to absolute 0 minus the MAT feed distance to free the mat/media 
  */
 void stepper_unload_paper( void )
 {
-    //stepper_speed( 8 );
-    stepper_move( -MAT_EDGE, 0 );
+    stepper_move( -( MAT_EDGE+ofs_x), -ofs_y );		// move to absolute position
 }
 
 /*
- * set the pressure on the pen.
+ * set the pressure of the cutter.
  */
 void stepper_pressure( int pressure )
 {
@@ -344,49 +395,38 @@ void stepper_pressure( int pressure )
     cmd_head++;
 }
 
-void stepper_set_pen_pressure_override(int p)
-{
-	pressure = p;
-}
 
-/* 
- * get current position. Only an indication for debugging purposes. 
- * During movement, this position changes asynchronously.
- */
-void stepper_get_pos( int *px, int *py )
-{
-    *px = x;
-    *py = y;
-}
 
 /*
  * The original firmware also removes the PWM signal, but it seems 
- * to work ok when you leave it on.
+ * to work OK when you leave it on.
  */
-void pen_up( void )
+void 
+pen_up( void )
 {
     if( PORTE & PEN )
-        delay = 50;
+        step_delay = 50;
+		
     PORTE &= ~PEN;
-    pen_seq = -1;
 }
 
 /*
  * move pen down
  */
- void pen_down( void )
+ void 
+ pen_down( void )
 {
 	int pe=PORTE;
 	
+	if ( loc_x < 0 || loc_y < 0)	// prevent dropping the cutter when there is no media underneath 
+		return;
+	
     if( pe & PEN )	// already down, ignore
        return;
-    /*
-     * soft pen drop with lowest pressure
-     */
-    //timer_set_pen_pressure( 1023 );
+  
     PORTE |= PEN;		
-    pen_seq = 0;
-    delay = pen_time[2];
+   
+    step_delay = 50;
 }
 
 /*
@@ -397,38 +437,41 @@ static void bresenham_init( int x1, int y1 )
 {
     int dx, dy;
 
-    if( x1 > x ) 
+    if( x1 > loc_x ) 
     { 
-	b.dx = 1;
-        dx = x1 - x;
+		b.dx = 1;
+        dx = x1 - loc_x;
     }
     else
     {
-	b.dx = -1;
-	dx = x - x1;
+		b.dx = -1;
+		dx = loc_x - x1;
     }
-    if( y1 > y )
+	
+    if( y1 > loc_y )
     {
-	b.dy = 1;
-        dy = y1 - y;
+		b.dy = 1;
+        dy = y1 - loc_y;
     }
     else
     {
-	b.dy = -1;
-        dy = y - y1;
+		b.dy = -1;
+        dy = loc_y - y1;
     }
+	
     if( dx > dy )
     {
-	b.steep = 0;
+		b.steep = 0;
         b.steps = dx;
-	b.delta = dy;
+		b.delta = dy;
     }
     else
     {
-	b.steep = 1;
+		b.steep = 1;
         b.steps = dy;
-	b.delta = dx;
+		b.delta = dx;
     }
+	
     b.step = 0;
     b.error = b.steps / 2;
 }
@@ -440,55 +483,60 @@ static void bresenham_step( void )
 {
     if( b.step >= b.steps )
     {
-        state = READY;
+        ActionState = READY;
         return;
     }
     b.step++;
     if( (b.error -= b.delta) < 0 )
     {
         b.error += b.steps;
-	x += b.dx;
-	y += b.dy;
+		loc_x += b.dx;
+		loc_y += b.dy;
     }
     else if( b.steep )
-	y += b.dy;
+		loc_y += b.dy;
     else
-	x += b.dx;
+		loc_x += b.dx;
 }
 
 /*
- * get next command from command queue.
+ * get next command from command queue. Called from the ISR at the READY state
  */
-enum state do_next_command( void )
+enum state 
+do_next_command( void )
 {
     struct cmd *cmd = get_cmd( );
 
-    if( !cmd )
+    if( cmd == NULL)
     { 
-       //pen_up( );
-       return READY;
+       return READY;		// Stay at the ready
     }
-    switch( cmd->type )
+	
+    switch( cmd->action_type )
     {
-	case MOVE: 
-	case DRAW: 
-	    // FIXME: avoid null-movements earlier 
-	    if( x == cmd->x && y == cmd->y )
-	        return READY;
-	    if( cmd->type == MOVE )
-			pen_up(); 
-	    else
-	        pen_down( );
-	    bresenham_init( cmd->x, cmd->y );
-	    return LINE;
-	case PRESSURE:
-	    pressure = cmd->x;
-	    timer_set_pen_pressure( pressure );
-	    break;
+		case MOVE: 
+		case DRAW: 
+				
+			if( cmd->action_type == MOVE )
+				pen_up(); 
+			else
+				pen_down( );
+			
+			// No motion required -- already where we want to go on both axes
+			if( loc_x == cmd->x && loc_y == cmd->y )
+				return READY;
+			
+			bresenham_init( cmd->x, cmd->y );
+			return LINE;
+		
+		case PRESSURE:
+			pressure = cmd->x;
+			timer_set_pen_pressure( pressure );
+			break;
 
-	case SPEED:
-	    timer_set_stepper_speed( cmd->x );
-	    break;
+		case SPEED:
+			timer_set_stepper_speed( cmd->x );
+			break;
     }
     return READY;
 }
@@ -499,102 +547,97 @@ enum state do_next_command( void )
  */
 void stepper_tick( void )
 {
-    /*
-     * experimental soft pen drop.
-     * A. At time=0, pen is dropped with minimal pressure
-     * B. At time=pen_time[0] pen is lifted again
-     * C. At time=pen_time[1] pen is dropped with set pressure
-     *
-     * The B-C interval should be short enough such that the pen 
-     * isn't actually going back up, but just loses most of its
-     * downward speed. This fixed the 'heavy dot' problem at the 
-     * the start of a stroke. Unfortunately, there's still a 
-     * 'heavy dot' when the pen is lifted. 
-     *
-     * Timing is still tied to stepper tick units, which should be 
-     * fixed. 
-     */
-	/*
-    if( pen_seq >= 0 )
-    {
-	pen_seq++;
-	if( pen_seq >= pen_time[1] )
+  
+	// this introduces a delay in the execution of stepper movements to allow for pen up,down,etc motions to be executed 
+    if( step_delay)
 	{
-	    PORTE |= PEN;
-	    timer_set_pen_pressure( pressure );
-	    pen_seq = -1;
-	}
-	else if( pen_seq >= pen_time[0] )
-	    PORTE &= ~PEN;
-    }
-	
-    */
-    if( delay && --delay )
+		step_delay--;
         return;
+	}
 	
-    // abort cutting if 'STOP' is pressed.
+// abort cutting if 'STOP' is pressed.
+// TODO: This is not sufficient -- also need to stop the flow of new commands from the UART and signal to the PC 
+// that we want to abort the job, otherwise we only stop what is currently in the queue
     if( keypad_stop_pressed() )	
     {
-        state = READY;
-		x = 0;
+        ActionState = READY;
+		loc_x = 0;
 		cmd_tail = cmd_head;
 		pen_up();
 		stepper_off( );
     }
 		
-again:
-    switch( state )
+    switch( ActionState )
     {
-	case HOME1:
-	    if( !at_home() && y > 0 )
-	    	y--;
-	    else
-		state = HOME2; 
+		case HOME0:
+			if (loc_y < 0)		// first move out by the offset given in the home init
+				loc_y++;		// so that the initial power on jolt doesn't trigger switch
+			else
+				ActionState=HOME1;
+		break;
+			
+		
+		case HOME1:
+			step_delay = 1;			// home at a reduced speed
+			if( !at_home() )
+		   		loc_y--;			// moving the carriage toward the home location
+			else
+				ActionState = HOME2;	// home switch touched -- now move the other way
 	    break;
 
     	case HOME2:
-	    if( at_home() )
-	       y++;
-	    else
-	    {
-	        y = 0;
-		state = READY;
-	    }
+			step_delay = 4;			
+			if( at_home() )
+				loc_y++;				// move the other way until the switch opens  
+			else
+			{
+				loc_y = 0;					// now this is home on Y axis
+				ofs_x = ofs_y = 0;
+				ActionState = READY;
+			}
 	    break;
 
-	case READY:
-	    state = do_next_command( );
-	    if( state != READY )
-	        goto again;
-	    break;
+		case READY:
+			if( (ActionState = do_next_command( )) == READY )
+				break;
+		// else fall through to LINE
      
      	case LINE:
-		    bresenham_step( );
+		    bresenham_step( );		// this gets the next loc_x and loc_y, incremented, decremented or left unchanged for the single step motion below
 	    break;
     }
-    if( state == READY )
+	
+    if( ActionState == READY )
     {
 	/* 
 	 * the motors get quite hot when powered on, so we turn them off
 	 * when idling. Ideally, you'd want to leave them on, so the user
-	 * can't move the pen/mat around. Maybe leave them at half-power ?
+	 * can't move the pen/mat around. 
+	 
+	 * Turning the motors off has the potential of loosing position by one or two steps when
+	 * they get turned back on.
+	 
+	 * A better solution might be a timeout where the steppers stay on power for a few seconds to not interrupt 
+	   the position while a cut is in progress but there is a delay in the queue...
+	 
 	 */
-        stepper_off( );		
-    }
-    else
+	    stepper_off( );		
+	}
+    else	// this is where the motion happens, command the stepper drives to the next step phase (1 out of 16)
     {
-		PORTA = phase[x & 0x0f];	// low 4 bits determine phase
-		PORTC = phase[y & 0x0f];
+		PORTA = StepperPhaseTable[ loc_x & 0x0f ];	// low 4 bits determine phase
+		PORTC = StepperPhaseTable[ loc_y & 0x0f ];
     }
 }
-
+/* 
+ * Enables the ports for stepper drivers and cutter up/down control
+ */ 
 void stepper_init( void )
 {
     stepper_off( );
-    pen_up( );
-    //DDRB |= DEBUG;
     DDRA = 0xff;
     DDRC = 0xff;
     DDRE |= PEN;
-    PORTD |= HOME; // enable pull-up
+    PORTD |= HOME;		// enable pull-up
+	stepper_home();		// Fubd the X home via switch
 }
