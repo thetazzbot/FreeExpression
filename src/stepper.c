@@ -21,7 +21,7 @@
  * blade starting point on the mat. A small amount of negative X is allowed
  * to roll the mat out of the machine.
  *
-		This source original developped by  https://github.com/Arlet/Freecut
+		This source original developed by  https://github.com/Arlet/Freecut
  
  * This file is part of FreeExpression.
  *
@@ -55,6 +55,8 @@
 #define MAX_Y		4800		// This is the width of the carriage 4800 == 12"
 //#define MAX_X		4800		// This is the length of the cutting media, for vinyl off the roll make this as long as the var can hold (signed)
 #define MAX_X		32000		// That's 80 inches of vinyl cutting -- 	
+#define MOTOR_OFF_DEL 30000		// number of iterations through the ISR after last motor movement before the stepper power gets turned off 
+								// 30000 is about 1 minute at speed 5
 
 #define HOME (1 << 1 ) // PD1, attached to 'home' push button
 #define PEN	(1 << 2)  // PE2, attached to pen up/down output
@@ -143,6 +145,7 @@ static struct bresenham
 } b;
 
 static int step_delay;		// delay between steps (if not 0)
+static unsigned short motor_off_delay = MOTOR_OFF_DEL;
 
 static enum state
 {
@@ -479,13 +482,13 @@ static void bresenham_init( int x1, int y1 )
 /*
  * perform single step in Bresenham line drawing algorithm.
  */
-static void bresenham_step( void )
+static enum state  bresenham_step( void )
 {
     if( b.step >= b.steps )
     {
-        ActionState = READY;
-        return;
+         return READY;
     }
+	
     b.step++;
     if( (b.error -= b.delta) < 0 )
     {
@@ -497,6 +500,8 @@ static void bresenham_step( void )
 		loc_y += b.dy;
     else
 		loc_x += b.dx;
+		
+	return LINE;
 }
 
 /*
@@ -542,8 +547,8 @@ do_next_command( void )
 }
 
 /*
- * This function is called by a timer interrupt. It does one motor step 
- * (if active).
+ * This function is called by a timer interrupt. It does one motor step.
+ *
  */
 void stepper_tick( void )
 {
@@ -561,7 +566,6 @@ void stepper_tick( void )
     if( keypad_stop_pressed() )	
     {
         ActionState = READY;
-		loc_x = 0;
 		cmd_tail = cmd_head;
 		pen_up();
 		stepper_off( );
@@ -599,34 +603,33 @@ void stepper_tick( void )
 
 		case READY:
 			if( (ActionState = do_next_command( )) == READY )
+			{
 				break;
+			}
 		// else fall through to LINE
      
      	case LINE:
-		    bresenham_step( );		// this gets the next loc_x and loc_y, incremented, decremented or left unchanged for the single step motion below
+		    ActionState = bresenham_step( );	// this gets the next loc_x and loc_y, incremented, decremented or left unchanged for the single step motion below
 	    break;
     }
+	
 	
     if( ActionState == READY )
     {
 	/* 
-	 * the motors get quite hot when powered on, so we turn them off
-	 * when idling. Ideally, you'd want to leave them on, so the user
-	 * can't move the pen/mat around. 
-	 
-	 * Turning the motors off has the potential of loosing position by one or two steps when
-	 * they get turned back on.
-	 
-	 * A better solution might be a timeout where the steppers stay on power for a few seconds to not interrupt 
-	   the position while a cut is in progress but there is a delay in the queue...
-	 
+	 * The motors get quite hot when powered on, so we turn them off after a certain time of idling.
+	 * Note this time is tied to the stepper speed, i.e. at high motor speed this time is shorter
 	 */
-	    stepper_off( );		
+		if (motor_off_delay )
+			motor_off_delay--;
+		else
+			stepper_off( );		
 	}
     else	// this is where the motion happens, command the stepper drives to the next step phase (1 out of 16)
     {
 		PORTA = StepperPhaseTable[ loc_x & 0x0f ];	// low 4 bits determine phase
 		PORTC = StepperPhaseTable[ loc_y & 0x0f ];
+		motor_off_delay = MOTOR_OFF_DEL;			// reset the timeout for the stepper motor power down
     }
 }
 /* 
