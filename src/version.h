@@ -17,5 +17,5 @@
  * along with FreeExpression. If not, see http://www.gnu.org/licenses/.
  *
  */
-#define VERSION "FreeExpression v0.2g"
+#define VERSION "FreeExpression v0.3g"
 

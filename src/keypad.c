@@ -196,18 +196,22 @@ int keypad_poll( void )
 	{
 		case KEYPAD_LOADMAT:
 		stepper_load_paper();
+		display_puts("Media loaded");
 		break;
 
 		case KEYPAD_UNLOADMAT:
 		stepper_unload_paper();
+		display_puts("Media unloaded");
 		break;
 		
 		case KEYPAD_RESETALL:
+		display_puts("Homing carriage...");
 		stepper_home();
 		break;
 		
 		case KEYPAD_BACKSPACE:
 		stepper_set_origin00();
+		display_puts("Location 0,0 set");
 		break;
 		
 		// this jogs X and Y freely -- use to load, unload or set position for  0,0 origin
@@ -219,7 +223,7 @@ int keypad_poll( void )
 		case KEYPAD_MOVEDNRIGHT:
 		case KEYPAD_MOVERIGHT:
 		case KEYPAD_MOVEUPRIGHT:
-		stepper_jog_manual(key,25);		// move 1/16 opf an inch each increment
+		stepper_jog_manual(key,25);		// move 1/16" each increment
 		
 		// For auto key repeat on these buttons , clear previous  kbd status[] so that a new button press registers again 
 		for(  c = 0; c < KBD_MAX_COLS; c++ )	
