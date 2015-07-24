@@ -139,6 +139,13 @@ extern void keypadSet_Speed_state( void);
 #define leds_on()	do { PORTD &= ~(1 << 5); } while(0)
 #define leds_off()	do { PORTD |=  (1 << 5); } while(0)
 
+typedef enum _languge {
+	HPGL=1,
+	G_CODE,
+	GPGL
+	} en_language;
+	
+extern en_language  Lang;
 
 
 #endif

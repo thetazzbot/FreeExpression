@@ -16,6 +16,13 @@ void display_puts(char *s)
 
 }
 
+void display_print(char *s) 
+{
+	fprintf( &lcd, "%s",s );
+
+}
+
+
 
 
 void display_println(char *s) 
@@ -23,6 +30,5 @@ void display_println(char *s)
 
 	fputs(s, &lcd );
 }
-
 
 

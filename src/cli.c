@@ -3,7 +3,7 @@
 *
 * command line interface
 *
-* Passes data to the HPGL state machine and processes interpreted results
+* Passes data to the Language parser & interprets the results
 *
 * TODO: Re-implement scaling
 * TODO: Implement store - or - cut feature
@@ -43,19 +43,42 @@
 #include "version.h"
 #include "shvars.h"
 #include "hpgl.h"
+#include "g_code.h"
 #include "display.h"
+#include "keypad.h"
 
 void cli_poll(void)
 {
 	STEPPER_COORD dstx, dsty;
 	char c;
+	int8_t cmd;
 	uint8_t labelchar;
 	
 	
-	while((c = (char)usb_getc())!=SERIAL_NO_DATA) {
-		int8_t cmd = hpgl_char(c, &dstx, &dsty, &labelchar);
-		if(dstx<0 || dsty<0) continue;
-		switch(cmd) {
+	while((c = (char)usb_getc())!=SERIAL_NO_DATA) 
+	{
+		switch(Lang)
+		{
+			case HPGL:
+			cmd = hpgl_char(c, &dstx, &dsty, &labelchar);
+			break;
+			
+			case G_CODE:
+			cmd = gcode_char(c, &dstx, &dsty );
+			break;
+			
+			//case GPGL:
+			// TODO
+			//break;
+			
+			default:
+			continue;		// just consume everything and do nothing
+			
+		}
+			
+
+		switch(cmd) 
+		{
 			case CMD_PU:
 			//sprintf(s,"PU: %d %d",dstx,dsty);
 			//display_puts( s);
@@ -63,14 +86,10 @@ void cli_poll(void)
 			break;
 			case CMD_PD:
 			//sprintf(s,"PD: %d %d",dstx,dsty);
-		//	display_puts( s);
+			//	display_puts( s);
 				stepper_draw( dstx, dsty );
 			break;
-			case CMD_PA:  // not supported
-			break;
-			case CMD_ARCABS:  // not supported
-				//arc_active = arc_init();
-			break;
+		
 			case CMD_INIT:
 				// 1. home
 				// 2. init scale etc
@@ -83,7 +102,13 @@ void cli_poll(void)
 			case CMD_SEEK0:
 			//sprintf(s,"SK: %d %d",dstx,dsty);
 			//display_puts( s);
-				stepper_move( dstx, dsty );
+				stepper_move( dstx, dsty  );
+			break;
+#ifdef non_supported_commands			
+			case CMD_PA:  // not supported
+			break;
+			case CMD_ARCABS:  // not supported
+				//arc_active = arc_init();
 			break;
 			case CMD_LB0:  // not supported
 			//	text_beginlabel();
@@ -111,9 +136,10 @@ void cli_poll(void)
 			//display_puts( s);
 			//	stepper_speed(numpad[0]);
 			break;
-			case CMD_AS: // accelaration not supported
+			case CMD_AS: // acceleration not supported
 				//set_acceleration_mode(numpad[0]);
 			break;
+#endif
 			default:
 			break;
 		}

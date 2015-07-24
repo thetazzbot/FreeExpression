@@ -3,7 +3,7 @@
  * 
  * FreeExpression firmware, main program
  *
- 		This source original developped by  https://github.com/Arlet/Freecut
+ 		This source original developed by  https://github.com/Arlet/Freecut
  *
  * This file is part of FreeExpression.
  *
@@ -58,14 +58,34 @@ void setup(void)
 	
 	msleep(100);
 	
-	display_println(VERSION );
+	display_print(VERSION );
+	// Unfortunate duplication of code here and in keaypac.c 
+	// TODO: moe into a function and call both places. 
+	switch (Lang)
+	{
+		case HPGL:
+			display_puts("HPGL selected");
+		break;
+		case GPGL:
+			display_puts("GPGL selected");
+		break;
+		
+		case G_CODE:
+			display_puts("G-CODE selected");
+		break;
+		
+	}
 	
+	usb_puts("\f");
 	usb_puts(VERSION);
 
 }
+
+
 int main( void )
 {
 	setup();
+	
     while( 1 )
     {
         cli_poll( ); // polls ready bytes from USB  and processes them

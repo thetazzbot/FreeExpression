@@ -3,7 +3,7 @@
 #include "shvars.h"
 
 
-#define SCRATCHPAD_SIZE 64
+
 
 char scratchpad[SCRATCHPAD_SIZE];
 double numpad[4];

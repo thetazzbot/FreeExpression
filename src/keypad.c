@@ -82,9 +82,11 @@
 #define data_l()	do { PORTD &= ~DATA; } while(0)
 #define get_rows()	(~PING & ROWS)
 
-uint8_t keypad_state[KBD_MAX_COLS];	// current state
-uint8_t keypad_prev[KBD_MAX_COLS];  // previous state
-uint16_t leds;
+static uint8_t keypad_state[KBD_MAX_COLS];	// current state
+static uint8_t keypad_prev[KBD_MAX_COLS];  // previous state
+static uint16_t leds;
+
+en_language Lang = HPGL;	
 
 static int k_state=0;
 /*
@@ -194,6 +196,21 @@ int keypad_poll( void )
 	
 	switch( key )
 	{
+		case KEYPAD_G:
+			Lang=G_CODE;
+			display_puts("G-CODE selected");
+			break;
+			
+		case KEYPAD_H:
+			Lang=HPGL;
+			display_puts("HPGL selected");
+			break;
+			
+		case KEYPAD_P:
+			Lang=GPGL;
+			display_puts("GPGL selected");
+			break;	
+			
 		case KEYPAD_LOADMAT:
 		stepper_load_paper();
 		display_puts("Media loaded");
