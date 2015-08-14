@@ -3,6 +3,7 @@
  * 
  * FreeExpression firmware, main program
  *
+ 		This source original developed by  https://github.com/Arlet/Freecut
  *
  * This file is part of FreeExpression.
  *
@@ -42,7 +43,7 @@
 
 void setup(void)
 {
-	
+	// Watchdogging disabled -- No use while debugging / testing 
 	//    wdt_enable( WDTO_30MS );
 	usb_init();
 	timer_init( );
@@ -52,27 +53,48 @@ void setup(void)
 	flash_init( );
 	hpgl_init();
 	dial_init( );
-	sei();
-	timer_set_pen_pressure(2); // medium pressure
-	timer_set_stepper_speed(6); // medium speed
-	msleep(10);
-
+		
+	sei();					// Start interrupts -- Motors will home immediately following this
+	
+	msleep(100);
+	
+	display_print(VERSION );
+	// Unfortunate duplication of code here and in keaypac.c 
+	// TODO: moe into a function and call both places. 
+	switch (Lang)
+	{
+		case HPGL:
+			display_puts("HPGL selected");
+		break;
+		case GPGL:
+			display_puts("GPGL selected");
+		break;
+		
+		case G_CODE:
+			display_puts("G-CODE selected");
+		break;
+		
+	}
+	
+	usb_puts("\f");
 	usb_puts(VERSION);
-	display_println(VERSION );
 
 }
+
+
 int main( void )
 {
 	setup();
+	
     while( 1 )
     {
-        cli_poll( ); // polls ready bytes from usb and processes them
+        cli_poll( ); // polls ready bytes from USB  and processes them
 		wdt_reset( );
 		if( flag_25Hz )
 		{
 			flag_25Hz = 0;
-			//02172015 - dial polling is broken for some reason, seems like a hardware issue on my expression
-			//dial_poll( );  // polls the dials and processes their state
+			
+			dial_poll( );  // polls the dials and processes their state
 			keypad_poll( ); // polls the keypad and executes functions
 		}
 		if( flag_Hz )

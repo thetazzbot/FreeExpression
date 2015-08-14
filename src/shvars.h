@@ -1,6 +1,7 @@
 #ifndef _SHVARS_H
 #define _SHVARS_H
 
+#define SCRATCHPAD_SIZE 64
 
 ///< Absolute coordinates used for stepper motion.
 ///< Negative means invalid.

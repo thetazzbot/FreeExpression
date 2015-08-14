@@ -4,8 +4,6 @@
  * support for LCD module
  *
  *
- * Copyright 2010 <freecutfirmware@gmail.com> 
- *
  * This file is part of Freecut.
  *
  * Freecut is free software: you can redistribute it and/or modify it
@@ -30,11 +28,9 @@
 extern FILE lcd;
 
 void lcd_init( void );
-void lcd_backlight_on( void );
-void lcd_backlight_off( void );
-int lcd_putchar( char c, FILE *stream );
-int lcd_getchar( FILE *stream );
-void lcd_pos( uint8_t pos );
+void lcd_position( unsigned char row, unsigned char col);		// 0 based row
+int lcd_putchar( char c );
+
 void lcd_puthex( uint8_t x );
 
 #endif

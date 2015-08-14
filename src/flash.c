@@ -226,6 +226,7 @@ uint8_t flash_write_next_byte(uint8_t data)
 /*
  * provide 'count' dummy clocks
  */
+/*
 static void flash_clocks( char count )
 {
     while( --count >= 0 )
@@ -234,6 +235,7 @@ static void flash_clocks( char count )
 		sck_low( );
     }
 }
+*/
 
 
 /*

@@ -37,11 +37,11 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
-    <avrtool>com.atmel.avrdbg.tool.avrdragon</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>2000</IspClock>
+          <IspClock>0</IspClock>
           <JtagDbgClock>200000</JtagDbgClock>
         </InterfaceProperties>
         <InterfaceName>ISP</InterfaceName>
@@ -50,12 +50,13 @@
       <ToolNumber>00A200051811</ToolNumber>
       <ToolName>AVR Dragon</ToolName>
     </com_atmel_avrdbg_tool_avrdragon>
-    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterface>JTAG</avrtoolinterface>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
         <InterfaceProperties>
         </InterfaceProperties>
-        <InterfaceName>ISP</InterfaceName>
+        <InterfaceName>
+        </InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
       <ToolNumber>
@@ -75,6 +76,18 @@
       <ToolName>STK500</ToolName>
     </com_atmel_avrdbg_tool_stk500>
     <preserveEEPROM>true</preserveEEPROM>
+    <com_atmel_avrdbg_tool_jtagicemkii>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.jtagicemkii</ToolType>
+      <ToolNumber>00B000002A14</ToolNumber>
+      <ToolName>JTAGICE mkII</ToolName>
+    </com_atmel_avrdbg_tool_jtagicemkii>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -107,45 +120,41 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
-        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG</Value>
-            <Value>F_CPU=16000000UL</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
-        <avrgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../m2u8</Value>
-          </ListValues>
-        </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>False</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
-        <avrgcc.compiler.optimization.PrepareDataForGarbageCollection>False</avrgcc.compiler.optimization.PrepareDataForGarbageCollection>
-        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.compiler.miscellaneous.OtherFlags />
-        <avrgcc.linker.libraries.Libraries>
-          <ListValues>
-            <Value>libm</Value>
-            <Value>m2u8</Value>
-          </ListValues>
-        </avrgcc.linker.libraries.Libraries>
-        <avrgcc.linker.libraries.LibrarySearchPaths>
-          <ListValues>
-            <Value>../m2u8/Debug</Value>
-          </ListValues>
-        </avrgcc.linker.libraries.LibrarySearchPaths>
-        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-      </AvrGcc>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=16000000UL</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>False</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <avrgcc.compiler.optimization.PrepareDataForGarbageCollection>False</avrgcc.compiler.optimization.PrepareDataForGarbageCollection>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.warnings.WarningsAsErrors>True</avrgcc.compiler.warnings.WarningsAsErrors>
+  <avrgcc.compiler.miscellaneous.OtherFlags />
+  <avrgcc.linker.general.GenerateMAPFile>False</avrgcc.linker.general.GenerateMAPFile>
+  <avrgcc.linker.general.UseVprintfLibrary>True</avrgcc.linker.general.UseVprintfLibrary>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+      <Value>libscanf_flt</Value>
+      <Value>scanf_flt</Value>
+      <Value>printf_flt</Value>
+      <Value>libprintf_flt</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
     </ToolchainSettings>
     <UsesExternalMakeFile>False</UsesExternalMakeFile>
     <BuildTarget>all</BuildTarget>
@@ -184,6 +193,15 @@
     <Compile Include="flash.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="avrlib.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="g_code.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="g_code.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="hpgl.c">
       <SubType>compile</SubType>
     </Compile>
@@ -194,6 +212,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="keypad.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="lcd.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="lcd.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
@@ -215,6 +239,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="shvars.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="stepper.c">

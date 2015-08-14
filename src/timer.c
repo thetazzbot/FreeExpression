@@ -125,26 +125,27 @@ void beep()
 }
 void timer_set_stepper_speed( int delay )
 {
-	// delay is displayed in single increment steps
-	// but internally each step represents 25 usecs delay in timer
-// testing limits from 0 to 255
-	current_stepper_speed = delay;
 	char string[40];
+	
+	// delay is displayed in single increment steps 1 through  MAX_STEPPER_SPEED_RANGES
+	// but internally each step represents ~25 usecs delay in timer
+
+	if (delay > MAX_STEPPER_SPEED_RANGES)
+		delay = MAX_STEPPER_SPEED_RANGES;
+	else if (delay < 1 ) 
+			delay =1;
+			
+	current_stepper_speed = delay;
+	
 	sprintf(string,"Speed: %d",current_stepper_speed);
 	display_puts(string);
 	
-	delay=(255 - (delay*25)); 
-	if(delay>255) delay=255;
-	if(delay<1) delay=1;
-    uint8_t prescaler = 4; // default 1:64 prescaler
+	delay=(255 - (delay*25));		// inverse
+	
+	   
     TCCR0B &= ~7;  // stop timer, and clear prescaler bit
-    if( delay > 256 )
-    {
-        delay /= 4;
-	    prescaler = 5;
-    }
     OCR0A = delay - 1;
-    TCCR0B |= prescaler;
+    TCCR0B |= 4; // default 1:64 prescaler
 }
 
 int timer_get_pen_pressure()
@@ -159,22 +160,27 @@ int timer_get_pen_pressure()
 
 void timer_set_pen_pressure( int pressure )
 {
+	char string[40];
 	// pen pressure is displayed in single increment steps
 	// but internally each step represents 50 usecs delay in pwm
-	// max_pen_pressure is the max value, not the maxium pressure
-	// maxium value of 500 is basically no pressure at all
+	// MAX_PEN_PWM is the max value for the PWM, not the maximum pressure
+	// maximum value of 500 is basically no pressure at all
 	// it could go as high as 1000 but that is pointless
 	// since anything between 500 and 1000 results in 6 volts
-	// which the solenoid doesnt care about.
-    if( pressure > MAX_PEN_PRESSURE/50 )
-        pressure = MAX_PEN_PRESSURE/50;
-	if(pressure < 1) pressure=1;
+	// which the solenoid doesn't care about.
+   
+    if( pressure > MAX_CUTTER_P_RANGES )
+        pressure = MAX_CUTTER_P_RANGES;
+	else if( pressure < 1)
+		 pressure=1;
+	
 	current_pen_pressure = pressure;
-	char string[40];
+	
 	sprintf(string,"Pressure: %d",pressure);
 	display_puts(string);
 
-    OCR1B  = (MAX_PEN_PRESSURE- (pressure*50));	
+	unsigned pwm = (pressure) * (( MAX_PEN_PWM - MIN_PEN_PWM)/MAX_CUTTER_P_RANGES);
+    OCR1B  = (MAX_PEN_PWM -pwm);	
 }
 
 /*
