@@ -27,10 +27,7 @@ This work was forked from https://github.com/thetazzbot/FreeExpression which ori
 
 
 This fork uses a Standard 4x20 LCD with a SPI interface in place of the graphics LCD that comes on the expression machine. See the hack_notes file for how this was added to the machine. *I did not want to spend the time and effort to figure out how to control the original LCD.*
-<<<<<<< HEAD
-=======
 
->>>>>>> 3085541210277da4bdaf4b877b876571462cf375
 
 
 If you still want to proceed:
@@ -76,21 +73,10 @@ After the machine moves the media/carriage there is a time of about 1 minute (de
 
 # Command language #
 
-<<<<<<< HEAD
+
 Currently supports HPGL -- HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
 
 After the machine moves the media/carriage there is a time of about 1 minute at speed 5 where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
-
-
-Currently supports HPGL -- HP Graphic Language. Cutting Speed and pressure is NOT taken from the language input, only from keyboard and dials.
-
-=======
-Currently supports HPGL and cnc type G-Code.	
-
-HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
-
-After the machine moves the media/carriage there is a time of about **1 minute** at speed 5 where the motors stay engaged so you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
->>>>>>> 3085541210277da4bdaf4b877b876571462cf375
 
 Hope to add an option for GPGL (Graphtec)  in the future. 
 
