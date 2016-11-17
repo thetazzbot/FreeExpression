@@ -27,6 +27,10 @@ This work was forked from https://github.com/thetazzbot/FreeExpression which ori
 
 
 This fork uses a Standard 4x20 LCD with a SPI interface in place of the graphics LCD that comes on the expression machine. See the hack_notes file for how this was added to the machine. *I did not want to spend the time and effort to figure out how to control the original LCD.*
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3085541210277da4bdaf4b877b876571462cf375
 
 
 If you still want to proceed:
@@ -53,6 +57,8 @@ Use Inkscape to draw and send a file to the cutter.  Inkscape 0.91 has an export
 - Cutter Up (Numeral 2)  : Moves the cutter away from the media.
 - Cutting Speed	(Xtra2) : In conjunction with the +/keys the cutting speed can be chosen in 9 steps.
 - Cutting Pressure (Xtra1) : In conjunction with the +/keys the cutting pressure can be adjusted in 9 steps.
+- Letter H : HPGL language selection, (default)
+- Letter G: G-code language selection, see file g-code.c for supported g-code tokens
 
 - Stop: Aborts the currently cached cutting operations, but new data arriving from the PC will still trigger subsequent motion.
 
@@ -66,11 +72,11 @@ Use Inkscape to draw and send a file to the cutter.  Inkscape 0.91 has an export
 
 ## Multi-cut and media lock ##
 
-<<<<<<< HEAD
 After the machine moves the media/carriage there is a time of about 1 minute (depending on speed setting) where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
 
 # Command language #
 
+<<<<<<< HEAD
 Currently supports HPGL -- HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
 
 After the machine moves the media/carriage there is a time of about 1 minute at speed 5 where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
@@ -78,8 +84,15 @@ After the machine moves the media/carriage there is a time of about 1 minute at 
 
 Currently supports HPGL -- HP Graphic Language. Cutting Speed and pressure is NOT taken from the language input, only from keyboard and dials.
 
+=======
+Currently supports HPGL and cnc type G-Code.	
 
-Hope to add an option for GPGL (Graphtec) and G-code in the future. 
+HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
+
+After the machine moves the media/carriage there is a time of about **1 minute** at speed 5 where the motors stay engaged so you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
+>>>>>>> 3085541210277da4bdaf4b877b876571462cf375
+
+Hope to add an option for GPGL (Graphtec)  in the future. 
 
 # CAD and Cutting #
 From the CAD system export via DXF format, then open that file in Inkscape. On the input dialog choose manual scale factor of 25.4 if the original CAD file was done in inch scale, otherwise set to 1.0. 
