@@ -25,20 +25,15 @@ Cricut is a trademark of PROVO CRAFT and this firmware is **not** a PROVO CRAFT 
 
 This work was forked from https://github.com/thetazzbot/FreeExpression which originally was forked from https://github.com/Arlet/Freecut  
 
-<<<<<<< HEAD
+
 This fork uses a Standard 4x20 LCD with a SPI interface in place of the graphics LCD that comes on the expression machine. See the hack_notes file for how this was added to the machine. *I did not want to spend the time and effort to figure out how to control the original LCD.*
-=======
-This fork uses a Standard 4x20 LCD with a SPI interface in place of the graphics LCD that comes on the expression machine. See the hack_notes file for how this was added to the machine. *I did not want to spend the time and effort to figure out how to control the original LCD*
->>>>>>> be03b3399f555707be8a981a255acc323206ff7b
 
 
 If you still want to proceed:
 
-<<<<<<< HEAD
-You will need an ATMEL programmer device and an Atmel Studio 6.2 or newer installation. I'm using an ATMEL JTAG ICE MKII pod and the JTAG interface of the AVR. See picture detailing connection and file Connector pinout.txt for details.
-=======
+
 You will need a ATMEL programmer device and an Atmel Studio 6.2 or newer installation. I'm using an ATMEL JTAG ICE MKII pod and the JTAG interface of the AVR. See picture and detailing connection and file Connector pinout.txt for details.
->>>>>>> be03b3399f555707be8a981a255acc323206ff7b
+
 
 Use Inkscape to draw and send a file to the cutter.  Inkscape 0.91 has an export to Plot feature (under Extensions) which sends a HPGL langauge file to the COM port where the cutter is connected to. Use 9600 baud and  make sure XON/XOFF is selected for flow control. Inkscape works good on WIndows and Linux machines. 
 
@@ -77,15 +72,19 @@ After the machine moves the media/carriage there is a time of about 1 minute (de
 # Command language #
 
 Currently supports HPGL -- HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
-=======
+
 After the machine moves the media/carriage there is a time of about 1 minute at speed 5 where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
 
-# Command language #
 
 Currently supports HPGL -- HP Graphic Language. Cutting Speed and pressure is NOT taken from the language input, only from keyboard and dials.
->>>>>>> be03b3399f555707be8a981a255acc323206ff7b
+
 
 Hope to add an option for GPGL (Graphtec) and G-code in the future. 
+
+# CAD and Cutting #
+From the CAD system export via DXF format, then open that file in Inkscape. On the input dialog choose manual scale factor of 25.4 if the original CAD file was done in inch scale, otherwise set to 1.0. 
+To cut, select all objects then use PATH/Object to Path, the Extensions/Export/Plot.  Plotter resolution set to 400 dpi.  Pen number, force and speed are ignored. Rotation and Mirror as desired. 
+Connection Settings are 9600/XON/XOFF and HPGL for language. Com port number as per device manger.   To execute press Apply. 
 
 
  
