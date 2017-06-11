@@ -114,7 +114,7 @@ static uint8_t StepperPhaseTable[] =
  * 
   The two variables loc_x and loc_y represent the current x/y location of the cutting tool and the lower 4 bits are directly 
   used to look up the stepper motor drive signals via the phase table (16 micro-steps in the stepper_tick ISR.
-  This implies that loc_xand loc_y always have to increment/decrement in steps of 1 in order not execute through all the phases. 
+  This implies that loc_xand loc_y always have to increment/decrement in steps of 1 in order to execute through all the phases. 
      
  * Initialize at left (away from home switch), and with the mat touching
  * the rollers, such that loading the mat is a simple movement to (0,0)
@@ -295,7 +295,7 @@ void stepper_move( int x, int y )
     cmd_head++;		// this really allocates the entry in the queue
 }
 /*
- * This moves the cutter/ media freely within the machines rage limits - can be used to set offsets and jog the carriage around
+ * This moves the cutter/ media freely within the machines range limits - can be used to set offsets and jog the carriage around
  */
 static void 
 stepper_jogRelative( int x, int y )
@@ -642,5 +642,5 @@ void stepper_init( void )
     DDRC = 0xff;
     DDRE |= PEN;
     PORTD |= HOME;		// enable pull-up
-	stepper_home();		// Fubd the X home via switch
+	stepper_home();		// Find the X home via switch
 }

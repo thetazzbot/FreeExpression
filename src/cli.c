@@ -82,12 +82,14 @@ void cli_poll(void)
 			case CMD_PU:
 			//sprintf(s,"PU: %d %d",dstx,dsty);
 			//display_puts( s);
-				stepper_move( dstx, dsty );
+				if (dstx >= 0 && dsty >= 0)	// filter out illegal moves 
+					stepper_move( dstx, dsty );
 			break;
 			case CMD_PD:
 			//sprintf(s,"PD: %d %d",dstx,dsty);
 			//	display_puts( s);
-				stepper_draw( dstx, dsty );
+				if (dstx >= 0 && dsty >= 0)	// filter out illegal moves 
+					stepper_draw( dstx, dsty );
 			break;
 		
 			case CMD_INIT:
