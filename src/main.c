@@ -3,7 +3,7 @@
  * 
  * FreeExpression firmware, main program
  *
- 		This source original developed by  https://github.com/Arlet/Freecut
+ * This source original developed by  https://github.com/Arlet/Freecut
  *
  * This file is part of FreeExpression.
  *
@@ -27,6 +27,7 @@
 #include <avr/wdt.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <asf.h>
 
 #include "usb.h"
 #include "keypad.h"
@@ -38,7 +39,7 @@
 #include "dial.h"
 #include "hpgl.h"
 #include "display.h"
-
+void setup(void);
 
 
 void setup(void)
@@ -47,6 +48,7 @@ void setup(void)
 	//    wdt_enable( WDTO_30MS );
 	usb_init();
 	timer_init( );
+	board_init();
 	stepper_init( );
 	display_init();
 	keypad_init( );
@@ -60,18 +62,18 @@ void setup(void)
 	
 	display_print(VERSION );
 	// Unfortunate duplication of code here and in keaypac.c 
-	// TODO: moe into a function and call both places. 
+	// TODO: more into a function and call both places. 
 	switch (Lang)
 	{
 		case HPGL:
-			display_puts("HPGL selected");
+			display_print("HPGL selected");
 		break;
 		case GPGL:
-			display_puts("GPGL selected");
+			display_print("GPGL selected");
 		break;
 		
 		case G_CODE:
-			display_puts("G-CODE selected");
+			display_print("G-CODE selected");
 		break;
 		
 	}

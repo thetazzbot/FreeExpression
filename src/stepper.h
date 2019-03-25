@@ -35,10 +35,11 @@ void stepper_home( void );
 void stepper_set_origin00(void );
 void stepper_unload_paper( void );
 void stepper_load_paper( void );
-void pen_up();
-void pen_down();
+void pen_up(void);
+void pen_down(void);
 void stepper_jog_manual(int direction, int dist);
-
+void stepper_off( void );
+enum state do_next_command( void );
 
 // These values are opposite of their named meaning
 // 1023 is "no pressure applied" and represents a very long

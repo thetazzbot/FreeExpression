@@ -7,6 +7,14 @@ THERE IS NO WAY TO GET THE ORIGINAL FIRMWARE BACK OTHER THAN BUYING A NEW MACHIN
 
 *******************************************************************************
 
+1/13/2019
+Updated project to Atmel Studio 7
+
+6/11/2017 
+Merged pull request from Gary Stofer to improve HGPL reliability
+
+Previous notes:
+
 Original firmware cannot be copied from another machine (it has been
 locked and cannot be read from the CPU)
 

@@ -33,10 +33,10 @@
 #include <avr/io.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include "keypad.h"
 #include "dial.h"
 #include "timer.h"
 #include "display.h"
-#include "keypad.h"
 
 static uint8_t channel = 0;
 static unsigned char pvars[MAX_DIALS]; // holds previous values

@@ -27,6 +27,17 @@
  * 14	| NC	| NC   | 	
  * Key layout is straightforward: column 0 is left, column 13 is right, 
  * row 0 is top, row 4 is bottom. The rest of the keys are on columns 14-19 
+ *
+ * Cricut Expression: The grey arrow keys and CUT key are mapped in column 14:
+ * 
+ * Row  | Key
+ *------+------
+ *  0   | Right
+ *  1   | Left 
+ *  2   | CUT 
+ *  3   | Up 
+ *  4   | Down 
+ 
  * 
   * The various LEDs are also connected to the shift register outputs, 
  * and can be turned on with the LED Enable pin (0=On, 1=Off).  
@@ -40,8 +51,8 @@
  * COL8  COL9
  * 
  *
- 		This source original developped by  https://github.com/Arlet/Freecut
- 
+ * This source original developped by  https://github.com/Arlet/Freecut
+ *
  * This file is part of FreeExpression.
  *
  * https://github.com/thetazzbot/FreeExpression
@@ -58,7 +69,6 @@
  * along with FreeExpression. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <inttypes.h>
@@ -69,6 +79,9 @@
 #include "display.h"
 #include "flash.h"
 // pin assignment
+// These appear to be the same on both the Cake and Expression machines
+// There are some machine specific routines in the keypad_cake.c and keypad_expression.c files
+// 
 #define STOP	(1 << 0)	// PD0
 #define LEDS	(1 << 5)	// PD5
 #define DATA	(1 << 6) 	// PD6
@@ -136,25 +149,24 @@ int keypad_scan( void )
     int pressed = -1;
 
     leds_off( );		// turn off LEDs during scan
-
-	
 	keypad_write_cols( 0);	// All bits to 0
     data_h( );				// shift in consecutive 1's
+	
     for( col = 0; col < KBD_MAX_COLS; col++ )
     {
 			keypad_state[col] = get_rows( );
 			clk_h( );
 			clk_l( );
-	    }
+	}
+	keypad_write_cols( ~leds );
+	leds_on( );	
 
     // keyboard has been scanned, now look for pressed keys
     for( col = 0; col < KBD_MAX_COLS; col++ )
     {
 		uint8_t diff = keypad_state[col] ^ keypad_prev[col];
-
 		if( diff )
 		{
-
 			for( row = 0; row < KBD_MAX_ROWS; row++ )
 			{
 				uint8_t mask = 1 << row;
@@ -162,11 +174,9 @@ int keypad_scan( void )
 				// we keep overwriting key pressed with readings from higher columns until the last column that shows the bit
 				if( diff & mask & keypad_state[col] )
 				{
-							pressed = row * KBD_MAX_COLS + col;
+					pressed = row * KBD_MAX_COLS + col;
 				}
 			}
-			
-
 		}
 		keypad_prev[col] = keypad_state[col];
     }
@@ -175,19 +185,17 @@ int keypad_scan( void )
 
 
 
-void 
-keypadSet_Speed_state( void )
+void keypadSet_Speed_state( void )
 {
 	k_state = KEYPAD_XTRA2;
 	
 }
-void 
-keypadSet_Pressure_state( void )
+void keypadSet_Pressure_state( void )
 {
 	k_state = KEYPAD_XTRA1;
 	
 }
-//keypad_poll is here instead of in keypad.c due to calling of various actions like load paper, etc.
+
 int keypad_poll( void )
 {
 	int c;
@@ -331,4 +339,3 @@ void keypad_init( void )
     DDRG &= ~ROWS;  // rows are inputs
     PORTG |= ROWS;  // enable internal pull-ups
 }
-

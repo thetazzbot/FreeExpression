@@ -21,8 +21,8 @@
  * blade starting point on the mat. A small amount of negative X is allowed
  * to roll the mat out of the machine.
  *
-		This source original developed by  https://github.com/Arlet/Freecut
- 
+ * This source original developed by  https://github.com/Arlet/Freecut
+ *
  * This file is part of FreeExpression.
  *
  * https://github.com/thetazzbot/FreeExpression
@@ -507,8 +507,7 @@ static enum state  bresenham_step( void )
 /*
  * get next command from command queue. Called from the ISR at the READY state
  */
-enum state 
-do_next_command( void )
+enum state do_next_command( void )
 {
     struct cmd *cmd = get_cmd( );
 

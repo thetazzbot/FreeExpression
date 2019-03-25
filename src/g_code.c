@@ -5,6 +5,7 @@
 #include "shvars.h"
 #include "hpgl.h"		// the enum in this file should really be in cli.h 
 #include "avrlibtypes.h"
+#include "g_code.h"
 
 #define DPI 400
 // TODO: DPI should be in stepper.h 

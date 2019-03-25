@@ -46,7 +46,6 @@
 #include "g_code.h"
 #include "display.h"
 #include "keypad.h"
-
 void cli_poll(void)
 {
 	STEPPER_COORD dstx, dsty;

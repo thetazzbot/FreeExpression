@@ -1,7 +1,14 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "FreeExpression", "FreeExpression.cproj", "{2DB61C7E-70C7-4213-B96E-2337EC078BE2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{667928C5-69CD-44DA-9947-B8268EAA0738} = {667928C5-69CD-44DA-9947-B8268EAA0738}
+	EndProjectSection
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "m2u8", "m2u8\m2u8.cproj", "{667928C5-69CD-44DA-9947-B8268EAA0738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +20,10 @@ Global
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Debug|AVR.Build.0 = Debug|AVR
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Release|AVR.ActiveCfg = Release|AVR
 		{2DB61C7E-70C7-4213-B96E-2337EC078BE2}.Release|AVR.Build.0 = Release|AVR
+		{667928C5-69CD-44DA-9947-B8268EAA0738}.Debug|AVR.ActiveCfg = Debug|AVR
+		{667928C5-69CD-44DA-9947-B8268EAA0738}.Debug|AVR.Build.0 = Debug|AVR
+		{667928C5-69CD-44DA-9947-B8268EAA0738}.Release|AVR.ActiveCfg = Release|AVR
+		{667928C5-69CD-44DA-9947-B8268EAA0738}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

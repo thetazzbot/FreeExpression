@@ -1,5 +1,9 @@
 # Object files
 *.o
+*.d
+*.lss
+*.srec
+*.eep
 *.ko
 *.obj
 *.elf

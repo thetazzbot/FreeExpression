@@ -37,6 +37,7 @@ void flash_start_write(uint32_t offset);
 void flash_init( void );
 uint8_t flash_write_next_byte(uint8_t data);
 void flash_test(void);
+void flash_flush(void);
 
 /*unsigned char Dataflash_Buffer_Read_Byte (unsigned char BufferNo, unsigned int IntPageAdr);
 void Dataflash_Buffer_Read_Str (unsigned char BufferNo, unsigned int IntPageAdr, unsigned int No_of_bytes, unsigned char *BufferPtr);
