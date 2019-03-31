@@ -55,6 +55,7 @@ void dial_poll( void )
 {
 	unsigned char i;
 	static unsigned char  queued = 0;
+	char string[40];
     
 	// records ADC readings from 2 or 3 ADC inputs on a round robin basis 	
     dial_adc[channel] = ADCH;
@@ -74,8 +75,8 @@ void dial_poll( void )
 		
 	if(pvars[DIAL_SPEED] != (i=dial_setting( DIAL_SPEED))) 
 	{
-		//sprintf(string,"Dial speed: %d\r",i);
-		//display_puts( string );
+		sprintf(string,"Dial speed: %d\r",i);
+		display_puts( string );
 		beep();
 		pvars[DIAL_SPEED]=i;
 		timer_set_stepper_speed(i);		
@@ -85,8 +86,8 @@ void dial_poll( void )
 	
 	if(pvars[DIAL_PRESSURE] != (i=dial_setting( DIAL_PRESSURE )))
 	{
-		//sprintf(string,"Dial pressure: %d\r",i);
-		//display_puts( string );
+		sprintf(string,"Dial pressure: %d\r",i);
+		display_puts( string );
 		beep();
 		pvars[DIAL_PRESSURE]=i;
 		timer_set_pen_pressure(i);

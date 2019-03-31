@@ -43,13 +43,20 @@
  * and can be turned on with the LED Enable pin (0=On, 1=Off).  
  *
  * LED Layout is as follows:
- *
+ * Function keys, F1 to F6, Material Size, Real Dial Size
  * COL0  COL1
  * COL2  COL3
  * COL4  COL5				COL10 (LED between CUT and Up arrow)
  * COL6  COL7
  * COL8  COL9
  * 
+ * On the Expression machine, there are numerous extra buttons that have LEDS
+ * But I cannot figure out how to individually address any of the leds
+ * Portrait, Mix n Match, Quantity
+ * Fit to Page, Fit to Length, Auto Fill
+ * Multi Cut, Center Point, Flip, Line Return
+ * Settings, Mat Size, xtra1, xtra2
+ * - arrow, + arrow, OK 
  *
  * This source original developped by  https://github.com/Arlet/Freecut
  *
@@ -78,6 +85,7 @@
 #include "stepper.h"
 #include "display.h"
 #include "flash.h"
+#include "usb.h"
 // pin assignment
 // These appear to be the same on both the Cake and Expression machines
 // There are some machine specific routines in the keypad_cake.c and keypad_expression.c files
@@ -88,7 +96,6 @@
 #define CLK		(1 << 7)	// PD7
 #define ROWS    (0x1f)		// mask for PG4-0
 
-
 #define clk_h()		do { PORTD |=  CLK;  } while(0)
 #define clk_l()		do { PORTD &= ~CLK;  } while(0)
 #define data_h()	do { PORTD |=  DATA; } while(0)
@@ -98,10 +105,13 @@
 static uint8_t keypad_state[KBD_MAX_COLS];	// current state
 static uint8_t keypad_prev[KBD_MAX_COLS];  // previous state
 static uint16_t leds;
+static uint8_t sound_mode = 1; // sound on
 
 en_language Lang = HPGL;	
 
 static int k_state=0;
+void _beep(int key);
+
 /*
  * keypad_write_cols: write all 16 column bits in 'val' to shift register.
  */
@@ -112,12 +122,12 @@ static void keypad_write_cols( short val )
     for( i = 0; i < KBD_MAX_COLS; i++ )
     {
         if( val < 0 ) 
-	    data_h( );
-	else
-	    data_l( );
-	clk_h( );
-	val <<= 1;
-	clk_l( );
+			data_h( );
+		else
+			data_l( );
+		clk_h( );
+		val <<= 1;
+		clk_l( );
     }
 }
 
@@ -148,7 +158,6 @@ int keypad_scan( void )
     int row, col;
     int pressed = -1;
 
-    leds_off( );		// turn off LEDs during scan
 	keypad_write_cols( 0);	// All bits to 0
     data_h( );				// shift in consecutive 1's
 	
@@ -159,7 +168,6 @@ int keypad_scan( void )
 			clk_l( );
 	}
 	keypad_write_cols( ~leds );
-	leds_on( );	
 
     // keyboard has been scanned, now look for pressed keys
     for( col = 0; col < KBD_MAX_COLS; col++ )
@@ -201,9 +209,25 @@ int keypad_poll( void )
 	int c;
 	int key = keypad_scan( );
 	char string[40];
+	#ifdef DEBUG_KEYBOARD
+	if(key>=0) {
+		sprintf(string,"%d",key);
+		display_puts(string);
+	}
+	#endif
+	// the button leds are really strange
+	// some of them are on a shift register it seems
+	// but some are directly connected to pins
+	//keypad_set_leds( 0x000 );
 	
 	switch( key )
 	{
+		case KEYPAD_SOUNDONOFF:
+			sound_mode = !sound_mode;
+			break;
+		case KEYPAD_FLIP:
+			usb_puts("Hello world");		
+			break;
 		case KEYPAD_G:
 			Lang=G_CODE;
 			display_puts("G-CODE selected");
@@ -262,12 +286,12 @@ int keypad_poll( void )
 		flash_test();
 		break;
 #endif
-		case KEYPAD_1:
+		case KEYPAD_F5:
 		display_puts("Cutter down");
 		pen_down();
 		break;
 		
-		case KEYPAD_2:
+		case KEYPAD_F6:
 		display_puts("Cutter up");
 		pen_up();
 		break;
@@ -316,19 +340,31 @@ int keypad_poll( void )
 				timer_set_stepper_speed(p);
 			}
 		break;
-		default:
-			if (key > 0 )		// if a key was pressed that is not assigned beep 
-			{
-				beeper_on( 2400 );
-				msleep( 50 );
-				beeper_off( );
-			}
-			break;
-			
-		
 	}
+	_beep(key);
 
 	return key;
+}
+void _beep(int key) {
+	switch(key)
+	{
+		case KEYPAD_MOVEUP:
+		case KEYPAD_MOVEUPLEFT:
+		case KEYPAD_MOVELEFT:
+		case KEYPAD_MOVEDNLEFT:
+		case KEYPAD_MOVEDN:
+		case KEYPAD_MOVEDNRIGHT:
+		case KEYPAD_MOVERIGHT:
+		case KEYPAD_MOVEUPRIGHT:		
+			break;
+		default:
+		if (sound_mode == 1 && key > 0 )		// if a key was pressed that is not assigned beep
+		{
+			beeper_on( 3600 );
+			msleep( 50 );
+			beeper_off( );
+		}
+	}
 }
 void keypad_init( void )
 {

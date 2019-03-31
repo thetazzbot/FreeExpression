@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>{2db61c7e-70c7-4213-b96e-2337ec078be2}</ProjectGuid>
+    <avrdevice>ATmega1281</avrdevice>
+    <avrdeviceseries>mega</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>Freecut</AssemblyName>
+    <Name>FreeExpression</Name>
+    <RootNamespace>Freecut</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.34.1" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.avrdragon</avrtool>
+    <com_atmel_avrdbg_tool_avrdragon>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.avrdragon</ToolType>
+      <ToolNumber>00A200051811</ToolNumber>
+      <ToolName>AVR Dragon</ToolName>
+    </com_atmel_avrdbg_tool_avrdragon>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions>
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
+    <com_atmel_avrdbg_tool_stk500>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.stk500</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>STK500</ToolName>
+    </com_atmel_avrdbg_tool_stk500>
+    <preserveEEPROM>true</preserveEEPROM>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
+    <avrtoolserialnumber>00A200051811</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9704</avrdeviceexpectedsignature>
+    <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.Device>-mmcu=atmega1281 -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega1281"</avrgcc.common.Device>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
+          </ListValues>
+        </avrgcc.assembler.general.IncludePaths>
+      </AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.Device>-mmcu=atmega1281 -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega1281"</avrgcc.common.Device>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>F_CPU=16000000UL</Value>
+      <Value>MACHINE_EXPRESSION</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../m2u8</Value>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>False</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <avrgcc.compiler.optimization.PrepareDataForGarbageCollection>False</avrgcc.compiler.optimization.PrepareDataForGarbageCollection>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.warnings.WarningsAsErrors>True</avrgcc.compiler.warnings.WarningsAsErrors>
+  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -mrelax</avrgcc.compiler.miscellaneous.OtherFlags>
+  <avrgcc.linker.general.GenerateMAPFile>False</avrgcc.linker.general.GenerateMAPFile>
+  <avrgcc.linker.general.UseVprintfLibrary>True</avrgcc.linker.general.UseVprintfLibrary>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+      <Value>libscanf_flt</Value>
+      <Value>scanf_flt</Value>
+      <Value>printf_flt</Value>
+      <Value>libprintf_flt</Value>
+      <Value>m2u8</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>../m2u8/Debug</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.LibrarySearchPaths>
+  <avrgcc.linker.miscellaneous.LinkerFlags>-Wl,--relax</avrgcc.linker.miscellaneous.LinkerFlags>
+  <avrgcc.assembler.general.AssemblerFlags>-mrelax -DBOARD=USER_BOARD</avrgcc.assembler.general.AssemblerFlags>
+  <avrgcc.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
+    </ListValues>
+  </avrgcc.assembler.general.IncludePaths>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
+    </ToolchainSettings>
+    <UsesExternalMakeFile>False</UsesExternalMakeFile>
+    <BuildTarget>all</BuildTarget>
+    <CleanTarget>clean</CleanTarget>
+    <ExternalMakeFilePath>
+    </ExternalMakeFilePath>
+    <OutputFileName>FreeExpression</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputType>Executable</OutputType>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="cli.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="cli.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="configs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="dial.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="dial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_oled.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_oled.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="flash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="flash.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avrlib.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="g_code.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="g_code.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hpgl.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hpgl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keypad.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keypad.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keypad_cake.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_lcd.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_lcd.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keypad_expression.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="scale.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="scale.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serial.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="shvars.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="shvars.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="stepper.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="stepper.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usb.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usb.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="version.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>

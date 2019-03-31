@@ -30,8 +30,6 @@ shvars.c
 
 spi.c
 
-src\ASF\common\boards\user_board\init.c
-
 stepper.c
 
 timer.c

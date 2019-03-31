@@ -5,6 +5,7 @@
 ///
 #ifndef _CONFIGS_H
 #define _CONFIGS_H
+#define DEBUG_KEYBOARD // define to display keycode values on the display for debugging key mapping header files
 
 #define NO_MAD_ACCEL			//!< gobsmackingly fast mode for little to none precision
 #define NO_SLOW_QUALITY			//!< painstakingly slow mode for extra precision, maybe
@@ -42,6 +43,7 @@
 
 // enable or disable onboard flash chip debugging
 // press key F1 on the keybad to do a flash test
-//#define DEBUG_FLASH
+#define DEBUG_FLASH
+//#define DEBUG_MODE //enables/disables wdtimer during debug mode
 
 #endif

@@ -5,7 +5,6 @@
  *  Author: adeva
  */ 
 
-
 #ifndef KEYPAD_H_
 #define KEYPAD_H_
 
@@ -23,8 +22,8 @@ char keypad_stop_pressed( void );
 void keypadSet_Speed_state( void );
 void keypadSet_Pressure_state( void );
 int keypad_scan( void );
-#define leds_on()	do { PORTD &= ~(1 << 5); } while(0)
-#define leds_off()	do { PORTD |=  (1 << 5); } while(0)
+#define leds_on()	do { PORTD &= ~(1 << 5); } while(0) // PD5
+#define leds_off()	do { PORTD |=  (1 << 5); } while(0) // PD5
 
 
 typedef enum _languge {
@@ -33,7 +32,7 @@ typedef enum _languge {
 	GPGL
 } en_language;
 
-extern en_language  Lang;
+extern en_language Lang;
 
 
 

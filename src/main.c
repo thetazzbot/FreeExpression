@@ -27,7 +27,6 @@
 #include <avr/wdt.h>
 #include <inttypes.h>
 #include <stdio.h>
-#include <asf.h>
 
 #include "usb.h"
 #include "keypad.h"
@@ -45,13 +44,12 @@ void setup(void);
 void setup(void)
 {
 	// Watchdogging disabled -- No use while debugging / testing 
-	//    wdt_enable( WDTO_30MS );
+	//wdt_enable( WDTO_30MS );
+	keypad_init( );
+	display_init();
 	usb_init();
 	timer_init( );
-	board_init();
 	stepper_init( );
-	display_init();
-	keypad_init( );
 	flash_init( );
 	hpgl_init();
 	dial_init( );
@@ -61,22 +59,6 @@ void setup(void)
 	msleep(100);
 	
 	display_print(VERSION );
-	// Unfortunate duplication of code here and in keaypac.c 
-	// TODO: more into a function and call both places. 
-	switch (Lang)
-	{
-		case HPGL:
-			display_print("HPGL selected");
-		break;
-		case GPGL:
-			display_print("GPGL selected");
-		break;
-		
-		case G_CODE:
-			display_print("G-CODE selected");
-		break;
-		
-	}
 	
 	usb_puts("\f");
 	usb_puts(VERSION);
