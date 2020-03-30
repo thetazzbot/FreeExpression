@@ -59,11 +59,60 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include "./m2u8/u8g.h"
 #include "display_oled.h"
+#include "timer.h"
 
+
+void _oled_display_speed(void);
+void _oled_display_pressure(void);
 u8g_t u8g;
 static uint8_t cur_x=0,cur_y=0;
+char display_message[80]; // 4 lines of 20 chars??
+
+// local functions
+/*
+Displays the currently selected speed as bars
+Must be called from inside the draw loop
+*/
+void _oled_display_speed(void)
+{
+	int p=timer_get_stepper_speed();
+	// at least one bar will always show
+		u8g_SetColorIndex(&u8g, 3);
+	u8g_DrawBox(&u8g, 30,62,2,2); // 1
+	if(p<2) u8g_SetColorIndex(&u8g, 1);
+	u8g_DrawBox(&u8g, 33,61,2,3); // 2
+	if(p<3) u8g_SetColorIndex(&u8g, 1);
+	u8g_DrawBox(&u8g, 36,60,2,4); // 3
+	if(p<4) u8g_SetColorIndex(&u8g, 1);
+	u8g_DrawBox(&u8g, 39,59,2,5); // 4
+	if(p<5)  u8g_SetColorIndex(&u8g, 1);
+	u8g_DrawBox(&u8g, 42,58,2,6); // 5
+	u8g_SetColorIndex(&u8g, 3);
+}
+
+/*
+Displays the currently selected pressure as bars
+Must be called from inside the draw loop
+*/
+void _oled_display_pressure(void)
+{
+	int p=timer_get_pen_pressure();
+		u8g_SetColorIndex(&u8g, 3);
+		u8g_DrawBox(&u8g, 54,62,2,2); // 1
+		if(p<2) u8g_SetColorIndex(&u8g, 1);
+		u8g_DrawBox(&u8g, 57,61,2,3); // 2
+		if(p<3) u8g_SetColorIndex(&u8g, 1);
+		u8g_DrawBox(&u8g, 60,60,2,4); // 3
+		if(p<4) u8g_SetColorIndex(&u8g, 1);
+		u8g_DrawBox(&u8g, 63,59,2,5); // 4
+		if(p<5) u8g_SetColorIndex(&u8g, 1);
+		u8g_DrawBox(&u8g, 66,58,2,6); // 5
+		u8g_SetColorIndex(&u8g, 3);
+}
+
 
 void oled_display_firstpage(void)
 {
@@ -94,17 +143,28 @@ void oled_display_init(void)
 
 }
 
+// main screen redraw functions
+void oled_display_update(void)
+{
+	oled_display_firstpage();
+	do {
+		u8g_DrawStr(&u8g, cur_x, cur_y, display_message);
+		_oled_display_speed();
+		_oled_display_pressure();
+	} while(oled_display_nextpage());
+	
+}
+
 /**
 * Displays a string using u8glib's "picture loop".  There is
 * significant lag happening here.
 */
-void oled_display_puts(char *s) {
-	oled_display_firstpage();
-	do {
-		u8g_DrawStr(&u8g, cur_x, cur_y, s);
-	} while(oled_display_nextpage());
-	
+void oled_display_puts(const char *s) {
+	strcpy(display_message,s);
+	oled_display_update();
 }
+
+
 
 /*
 * Horrible code that needs to go away and be replaced by something better
@@ -115,22 +175,6 @@ void oled_display_println(char *s) {
 	cur_y+=10;
 	cur_x=0;
 }
-int oled_display_putc( char c)
-{
-	char buf[2];
-	buf[1]=0x00;
-	buf[0]=c;
-	if(c=='\r') {
-		cur_x++;
-	}
-	if(c=='\n') {
-		cur_y=0;
-	}
-    u8g_SetFont(&u8g, u8g_font_6x10);	
-	u8g_DrawStr(&u8g, cur_x, cur_y, buf);
-	cur_y++;
-	
-	return 1;
-}
+
 
 #endif //#ifdef MACHINE_EXPRESSION

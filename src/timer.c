@@ -125,8 +125,6 @@ void beep()
 }
 void timer_set_stepper_speed( int delay )
 {
-	char string[40];
-	
 	// delay is displayed in single increment steps 1 through  MAX_STEPPER_SPEED_RANGES
 	// but internally each step represents ~25 usecs delay in timer
 
@@ -137,15 +135,15 @@ void timer_set_stepper_speed( int delay )
 			
 	current_stepper_speed = delay;
 	
-	sprintf(string,"Speed: %d",current_stepper_speed);
-	display_puts(string);
-	
 	delay=(255 - (delay*25));		// inverse
 	
 	   
     TCCR0B &= ~7;  // stop timer, and clear prescaler bit
     OCR0A = delay - 1;
     TCCR0B |= 4; // default 1:64 prescaler
+	
+	//display_update();
+	
 }
 
 int timer_get_pen_pressure()
@@ -160,7 +158,6 @@ int timer_get_pen_pressure()
 
 void timer_set_pen_pressure( int pressure )
 {
-	char string[40];
 	// pen pressure is displayed in single increment steps
 	// but internally each step represents 50 usecs delay in pwm
 	// MAX_PEN_PWM is the max value for the PWM, not the maximum pressure
@@ -176,11 +173,10 @@ void timer_set_pen_pressure( int pressure )
 	
 	current_pen_pressure = pressure;
 	
-	sprintf(string,"Pressure: %d",pressure);
-	display_puts(string);
 
 	unsigned pwm = (pressure) * (( MAX_PEN_PWM - MIN_PEN_PWM)/MAX_CUTTER_P_RANGES);
     OCR1B  = (MAX_PEN_PWM -pwm);	
+	//display_update();
 }
 
 /*

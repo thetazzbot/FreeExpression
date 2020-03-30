@@ -208,8 +208,8 @@ int keypad_poll( void )
 {
 	int c;
 	int key = keypad_scan( );
-	char string[40];
 	#ifdef DEBUG_KEYBOARD
+	char string[40];
 	if(key>=0) {
 		sprintf(string,"%d",key);
 		display_puts(string);
@@ -299,17 +299,11 @@ int keypad_poll( void )
 		
 		case KEYPAD_XTRA1:
 		{
-			int p=timer_get_pen_pressure();
-			sprintf(string,"Pressure: %d",p);
-			display_puts(string);
 			k_state=key;
 			break;
 		}
 		case KEYPAD_XTRA2: 
 		{
-			int p=timer_get_stepper_speed();
-			sprintf(string,"Speed: %d",p);
-			display_puts(string);
 			k_state=key;
 			break;
 		}
@@ -342,7 +336,6 @@ int keypad_poll( void )
 		break;
 	}
 	_beep(key);
-
 	return key;
 }
 void _beep(int key) {

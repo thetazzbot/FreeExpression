@@ -1,0 +1,565 @@
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+void oled_Command(unsigned char Data)
+{
+GPIO_Write(GPIOB, Data);//6800 mode
+GPIO_ResetBits(GPIOC, RS);
+GPIO_ResetBits(GPIOC, CS1);
+GPIO_ResetBits(GPIOC, RW);
+GPIO_SetBits(GPIOC, E1);
+OLED_uDelay(100);
+GPIO_ResetBits(GPIOC, E1);
+OLED_uDelay(100);
+GPIO_SetBits(GPIOC, RW);
+GPIO_SetBits(GPIOC, CS1);
+GPIO_SetBits(GPIOC, RS);
+}
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+
+void oled_Data(unsigned char Data)
+{
+GPIO_Write(GPIOB, Data);//6800 mode
+GPIO_SetBits(GPIOC, RS);
+GPIO_ResetBits(GPIOC, CS1);
+GPIO_ResetBits(GPIOC, RW);
+GPIO_SetBits(GPIOC, E1);
+OLED_uDelay(100);
+GPIO_ResetBits(GPIOC, E1);
+OLED_uDelay(100);
+GPIO_SetBits(GPIOC, RW);
+GPIO_SetBits(GPIOC, CS1);
+GPIO_SetBits(GPIOC, RS);
+}
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Instruction Setting
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Set_Column_Address_12864(unsigned char a, unsigned char b)
+{
+	oled_Command(0x15);			// Set Column Address
+	oled_Command(a);			//   Default => 0x00
+	oled_Command(b);			//   Default => 0x3F (Total Columns Devided by 2)
+}
+
+
+void Set_Row_Address_12864(unsigned char a, unsigned char b)
+{
+	oled_Command(0x75);			// Set Row Address
+	oled_Command(a);			//   Default => 0x00
+	oled_Command(b);			//   Default => 0x4F
+}
+
+
+void Set_Contrast_Current_12864(unsigned char d)
+{
+	oled_Command(0x81);			// Set Contrast Value
+	oled_Command(d);			//   Default => 0x40
+}
+
+
+void Set_Current_Range_12864(unsigned char d)
+{
+	oled_Command(0x84|d);			// Set Current Range
+						//   Default => 0x84
+						//     0x84 (0x00) => Quarter Current Range
+						//     0x85 (0x01) => Half Current Range
+						//     0x86 (0x02) => Full Current Range
+}
+
+
+void Set_Remap_Format_12864(unsigned char d)
+{
+	oled_Command(0xA0);			// Set Re-Map & Data Format
+	oled_Command(d);			//   Default => 0x00
+						//     Column Address 0 Mapped to SEG0
+						//     Disable Nibble Re-Map
+						//     Horizontal Address Increment
+						//     Scan from COM0 to COM[N-1]
+						//     Disable COM Split Odd Even
+}
+
+
+void Set_Start_Line_12864(unsigned char d)
+{
+	oled_Command(0xA1);			// Set Display Start Line
+	oled_Command(d);			//   Default => 0x00
+}
+
+
+void Set_Display_Offset_12864(unsigned char d)
+{
+	oled_Command(0xA2);			// Set Display Offset
+	oled_Command(d);			//   Default => 0x00
+}
+
+
+void Set_Display_Mode_12864(unsigned char d)
+{
+	oled_Command(0xA4|d);			// Set Display Mode
+						//   Default => 0xA4
+						//     0xA4 (0x00) => Normal Display
+						//     0xA5 (0x01) => Entire Display On, All Pixels Turn On at GS Level 15
+						//     0xA6 (0x02) => Entire Display Off, All Pixels Turn Off
+						//     0xA7 (0x03) => Inverse Display
+}
+
+
+void Set_Multiplex_Ratio_12864(unsigned char d)
+{
+	oled_Command(0xA8);			// Set Multiplex Ratio
+	oled_Command(d);			//   Default => 0x5F
+}
+
+
+void Set_Master_Config_12864(unsigned char d)
+{
+	oled_Command(0xAD);			// Set Master Configuration
+	oled_Command(0x02|d);			//   Default => 0x03
+						//     0x02 (0x00) => Select External VCC Supply
+						//     0x03 (0x01) => Select Internal DC/DC Voltage Converter
+}
+
+
+void Set_Display_On_Off_12864(unsigned char d)
+{
+	oled_Command(0xAE|d);			// Set Display On/Off
+						//   Default => 0xAE
+						//     0xAE (0x00) => Display Off
+						//     0xAF (0x01) => Display On
+}
+
+
+void Set_Phase_Length_12864(unsigned char d)
+{
+	oled_Command(0xB1);			// Phase 1 & 2 Period Adjustment
+	oled_Command(d);			//   Default => 0x53 (5 Display Clocks [Phase 2] / 3 Display Clocks [Phase 1])
+						//     D[3:0] => Phase 1 Period in 1~15 Display Clocks
+						//     D[7:4] => Phase 2 Period in 1~15 Display Clocks
+}
+
+
+void Set_Frame_Frequency_12864(unsigned char d)
+{
+	oled_Command(0xB2);			// Set Frame Frequency (Row Period)
+	oled_Command(d);			//   Default => 0x25 (37 Display Clocks)
+}
+
+
+void Set_Display_Clock_12864(unsigned char d)
+{
+	oled_Command(0xB3);			// Display Clock Divider/Osciallator Frequency
+	oled_Command(d);			//   Default => 0x41
+						//     D[3:0] => Display Clock Divider
+						//     D[7:4] => Oscillator Frequency
+}
+
+
+void Set_Precharge_Compensation_12864(unsigned char a, unsigned char b)
+{
+	oled_Command(0xB4);			// Set Pre-Charge Compensation Level
+	oled_Command(b);			//   Default => 0x00 (No Compensation)
+
+	if(a == 0x20)
+	{
+		oled_Command(0xB0);		// Set Pre-Charge Compensation Enable
+		oled_Command(0x08|a);		//   Default => 0x08
+						//     0x08 (0x00) => Disable Pre-Charge Compensation
+						//     0x28 (0x20) => Enable Pre-Charge Compensation
+	}
+}
+
+
+void Set_Precharge_Voltage_12864(unsigned char d)
+{
+	oled_Command(0xBC);			// Set Pre-Charge Voltage Level
+	oled_Command(d);			//   Default => 0x10 (Connect to VCOMH)
+}
+
+
+void Set_VCOMH_12864(unsigned char d)
+{
+	oled_Command(0xBE);			// Set Output Level High Voltage for COM Signal
+	oled_Command(d);			//   Default => 0x1D (0.81*VREF)
+}
+
+
+void Set_VSL_12864(unsigned char d)
+{
+	oled_Command(0xBF);			// Set Segment Low Voltage Level
+	oled_Command(0x02|d);			//   Default => 0x0E
+						//     0x02 (0x00) => Keep VSL Pin Floating
+						//     0x0E (0x0C) => Connect a Capacitor between VSL Pin & VSS
+}
+
+
+void GA_Option_12864(unsigned char d)
+{
+	oled_Command(0x23);			// Graphic Acceleration Command Options
+	oled_Command(d);			//   Default => 0x01
+						//     Enable Fill Rectangle
+						//     Disable Wrap around in Horizontal Direction During Copying & Scrolling
+						//     Disable Reverse Copy
+}
+
+
+void Draw_Rectangle_12864(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e)
+{
+	oled_Command(0x24);			// Draw Rectangle
+	oled_Command(a);			//   Column Address of Start
+	oled_Command(c);			//   Row Address of Start
+	oled_Command(b);			//   Column Address of End (Total Columns Devided by 2)
+	oled_Command(d);			//   Row Address of End
+	oled_Command(e);			//   Gray Scale Level
+	OLED_uDelay(200);
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Regular Pattern (Full Screen)
+//
+//    a: Two Pixels Data
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Fill_RAM_12864(unsigned char a)
+{
+	GA_Option_12864(0x01);
+	Draw_Rectangle_12864(0x00,0x3F,0x00,0x5F,a);
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Regular Pattern (Partial or Full Screen)
+//
+//    a: Column Address of Start
+//    b: Column Address of End (Total Columns Devided by 2)
+//    c: Row Address of Start
+//    d: Row Address of End
+//    e: Two Pixels Data
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Fill_Block_12864(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e)
+{
+	GA_Option_12864(0x01);
+	Draw_Rectangle_12864(a,b,c,d,e);
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Checkboard (Full Screen)
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Checkerboard_12864()
+{
+unsigned char i,j;
+	
+	Set_Column_Address_12864(0x00,0x3F);
+	Set_Row_Address_12864(0x00,0x5F);
+
+	for(i=0;i<40;i++)
+	{
+		for(j=0;j<64;j++)
+		{
+			oled_Data(0xF0);
+		}
+		for(j=0;j<64;j++)
+		{
+			oled_Data(0x0F);
+		}
+	}
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Gray Scale Bar (Full Screen)
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Grayscale_12864()
+{
+	//   Level 16 => Column 1~8
+		Fill_Block_12864(0x00,0x03,0x00,0x3F,0xFF);
+
+	//   Level 15 => Column 9~16
+		Fill_Block_12864(0x04,0x07,0x00,0x3F,0xEE);
+
+	//   Level 14 => Column 17~24
+		Fill_Block_12864(0x08,0x0B,0x00,0x3F,0xDD);
+
+	//   Level 13 => Column 25~32
+		Fill_Block_12864(0x0C,0x0F,0x00,0x3F,0xCC);
+
+	//   Level 12 => Column 33~40
+		Fill_Block_12864(0x10,0x13,0x00,0x3F,0xBB);
+
+	//   Level 11 => Column 41~48
+		Fill_Block_12864(0x14,0x17,0x00,0x3F,0xAA);
+
+	//   Level 10 => Column 49~56
+		Fill_Block_12864(0x18,0x1B,0x00,0x3F,0x99);
+
+	//   Level 9 => Column 57~64
+		Fill_Block_12864(0x1C,0x1F,0x00,0x3F,0x88);
+
+	//   Level 8 => Column 65~72
+		Fill_Block_12864(0x20,0x23,0x00,0x3F,0x77);
+
+	//   Level 7 => Column 73~80
+		Fill_Block_12864(0x24,0x27,0x00,0x3F,0x66);
+
+	//   Level 6 => Column 81~88
+		Fill_Block_12864(0x28,0x2B,0x00,0x3F,0x55);
+
+	//   Level 5 => Column 89~96
+		Fill_Block_12864(0x2C,0x2F,0x00,0x3F,0x44);
+
+	//   Level 4 => Column 97~104
+		Fill_Block_12864(0x30,0x33,0x00,0x3F,0x33);
+
+	//   Level 3 => Column 105~112
+		Fill_Block_12864(0x34,0x37,0x00,0x3F,0x22);
+
+	//   Level 2 => Column 113~120
+		Fill_Block_12864(0x38,0x3B,0x00,0x3F,0x11);
+
+	//   Level 1 => Column 121~128
+		Fill_Block_12864(0x3C,0x3F,0x00,0x3F,0x00);
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Character (5x7)
+//
+//    a: Database
+//    b: Ascii
+//    c: Start X Address
+//    d: Start Y Address
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Show_Font57_12864(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+{
+unsigned char *Src_Pointer=0;
+unsigned char i,Font,MSB,LSB;
+
+	switch(a)
+	{
+		case 1:
+			Src_Pointer=&Ascii_1[(b-1)][0];
+			break;
+		case 2:
+			//Src_Pointer=&Ascii_2[(b-1)][0];
+			break;
+	}
+
+	Set_Remap_Format_12864(0x54);
+	for(i=0;i<=4;i+=2)
+	{
+		LSB=*Src_Pointer;
+		Src_Pointer++;
+		if(i == 4)
+		{
+			MSB=0x00;
+		}
+		else
+		{
+			MSB=*Src_Pointer;
+			Src_Pointer++;
+		}
+ 		Set_Column_Address_12864(c,c);
+		Set_Row_Address_12864(d,d+7);
+
+		Font=((MSB&0x01)<<4)|(LSB&0x01);
+		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
+		oled_Data(Font);
+
+		Font=((MSB&0x02)<<3)|((LSB&0x02)>>1);
+		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
+		oled_Data(Font);
+
+		Font=((MSB&0x04)<<2)|((LSB&0x04)>>2);
+		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
+		oled_Data(Font);
+
+		Font=((MSB&0x08)<<1)|((LSB&0x08)>>3);
+		Font=Font|(Font<<1)|(Font<<2)|(Font<<3);
+		oled_Data(Font);
+
+		Font=((MSB&0x10)<<3)|((LSB&0x10)>>1);
+		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
+		oled_Data(Font);
+
+		Font=((MSB&0x20)<<2)|((LSB&0x20)>>2);
+		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
+		oled_Data(Font);
+
+		Font=((MSB&0x40)<<1)|((LSB&0x40)>>3);
+		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
+		oled_Data(Font);
+
+		Font=(MSB&0x80)|((LSB&0x80)>>4);
+		Font=Font|(Font>>1)|(Font>>2)|(Font>>3);
+		oled_Data(Font);
+		c++;
+	}
+	Set_Remap_Format_12864(0x50);
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show String
+//
+//    a: Database
+//    b: Start X Address
+//    c: Start Y Address
+//    * Must write "0" in the end...
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Show_String_12864(unsigned char a, unsigned char *Data_Pointer, unsigned char b, unsigned char c)
+{
+unsigned char *Src_Pointer;
+
+	Src_Pointer=Data_Pointer;
+	Show_Font57_12864(1,96,b,c);			// No-Break Space
+						//   Must be written first before the string start...
+
+	while(1)
+	{
+		Show_Font57_12864(a,*Src_Pointer,b,c);
+		Src_Pointer++;
+		b+=3;
+		if(*Src_Pointer == 0) break;
+	}
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Show Pattern (Partial or Full Screen)
+//
+//    a: Column Address of Start
+//    b: Column Address of End (Total Columns Divided by 2)
+//    c: Row Address of Start
+//    d: Row Address of End
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Show_Pattern_12864(unsigned char *Data_Pointer, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+{
+unsigned char *Src_Pointer;
+unsigned char i,j;
+	
+	Src_Pointer=Data_Pointer;
+	Set_Column_Address_12864(a,b);
+	Set_Row_Address_12864(c,d);
+
+	for(i=0;i<(d-c+1);i++)
+	{
+		for(j=0;j<(b-a+1);j++)
+		{
+			oled_Data(*Src_Pointer);
+			Src_Pointer++;
+		}
+	}
+}
+
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Vertical Scrolling (Full Screen)
+//
+//    a: Scrolling Direction
+//       "0x00" (Upward)
+//       "0x01" (Downward)
+//    b: Set Numbers of Row Scroll per Step
+//    c: Set Time Interval between Each Scroll Step
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void Set_Gray_Scale_Table_12864()
+{
+	oled_Command(0xB8);			// Set Gray Scale Table
+	oled_Command(0x01);			//   Gray Scale Level 1
+	oled_Command(0x11);			//   Gray Scale Level 3 & 2
+	oled_Command(0x22);			//   Gray Scale Level 5 & 4
+	oled_Command(0x32);			//   Gray Scale Level 7 & 6
+	oled_Command(0x43);			//   Gray Scale Level 9 & 8
+	oled_Command(0x54);			//   Gray Scale Level 11 & 10
+	oled_Command(0x65);			//   Gray Scale Level 13 & 12
+	oled_Command(0x76);			//   Gray Scale Level 15 & 14
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Initialization
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+void OLED_12864_Init()
+{
+unsigned char i;
+Max_Column = 0x3F;			// 128/2-1 (Total Columns Devided by 2)
+Max_Row = 0x3F;				// 64-1
+Brightness = 0x7F;
+	GPIO_ResetBits(GPIOC, RES);	
+	for(i=0;i<200;i++)
+	{
+		OLED_uDelay(200);
+	}
+	GPIO_SetBits(GPIOC, RES);  
+
+	Set_Display_On_Off_12864(0x00);		// Display Off (0x00/0x01)
+	Set_Display_Clock_12864(0x91);		// Set Clock as 135 Frames/Sec
+	Set_Multiplex_Ratio_12864(0x3F);		// 1/64 Duty (0x0F~0x5F)
+	Set_Display_Offset_12864(0x4C);		// Shift Mapping RAM Counter (0x00~0x5F)
+	Set_Start_Line_12864(0x00);			// Set Mapping RAM Display Start Line (0x00~0x5F)
+	Set_Master_Config_12864(0x00);		// Disable Embedded DC/DC Converter (0x00/0x01)
+	Set_Remap_Format_12864(0x50);			// Set Column Address 0 Mapped to SEG0
+						//     Disable Nibble Remap
+						//     Horizontal Address Increment
+						//     Scan from COM[N-1] to COM0
+						//     Enable COM Split Odd Even
+	Set_Current_Range_12864(0x02);		// Set Full Current Range
+	Set_Gray_Scale_Table_12864();			// Set Pulse Width for Gray Scale Table
+	Set_Contrast_Current_12864(Brightness);	// Set Scale Factor of Segment Output Current Control
+	Set_Frame_Frequency_12864(0x51);		// Set Frame Frequency
+	Set_Phase_Length_12864(0x55);			// Set Phase 1 as 5 Clocks & Phase 2 as 5 Clocks
+	Set_Precharge_Voltage_12864(0x10);		// Set Pre-Charge Voltage Level
+	Set_Precharge_Compensation_12864(0x20,0x02);	// Set Pre-Charge Compensation
+	Set_VCOMH_12864(0x1C);			// Set High Voltage Level of COM Pin
+	Set_VSL_12864(0x0D);				// Set Low Voltage Level of SEG Pin
+	Set_Display_Mode_12864(0x00);			// Normal Display Mode (0x00/0x01/0x02/0x03)
+
+	Fill_RAM_12864(0x00);				// Clear Screen
+
+	Set_Display_On_Off_12864(0x01);		// Display On (0x00/0x01)
+}
+
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+//  Demonstration
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+int oled_12864(void)
+{
+OLED_12864_Init();
+
+Set_Column_Address_12864(0x00,0x3F);
+Set_Row_Address_12864(0x00,0x3F);
+
+counter = 0;
+for(i=0;i<64;i++){ //these loops expand the bitmap data because the bmp file is monochrome image (only ON or OFF, no grayscale)
+	for(j=0;j<16;j++){   
+	datum = Buff[counter];
+	datum = ((datum >> 6) & 0x03);//move over and mask the highest 2 bits
+	if(datum == 0x03){oled_Data(0xFF);}//if both bits are high, send 0xFF to OLED
+	else if(datum == 0x02){oled_Data(0x0F);}//if one bit is high, send 0x0F to OLED
+	else if(datum == 0x01){oled_Data(0xF0);}
+	else oled_Data(0x00);//if neither bit is high, send 0x00 to OLED
+
+	datum = Buff[counter];
+	datum = ((datum >> 4) & 0x03);//move over and mask the 3&4th bits
+	if(datum == 0x03){oled_Data(0xFF);}
+	else if(datum == 0x02){oled_Data(0x0F);}
+	else if(datum == 0x01){oled_Data(0xF0);}
+	else oled_Data(0x00);
+
+	datum = Buff[counter];
+	datum = ((datum >> 2) & 0x03);//move over and mask the 5&6th bits
+	if(datum == 0x03){oled_Data(0xFF);}
+	else if(datum == 0x02){oled_Data(0x0F);}
+	else if(datum == 0x01){oled_Data(0xF0);}
+	else oled_Data(0x00);
+
+	datum = Buff[counter];
+	datum = (datum & 0x03);//mask the lowest 2 bits
+	if(datum == 0x03){oled_Data(0xFF);}
+	else if(datum == 0x02){oled_Data(0x0F);}
+	else if(datum == 0x01){oled_Data(0xF0);}
+	else oled_Data(0x00);
+	
+	counter++;
+	}}
+
+return 1;
+}

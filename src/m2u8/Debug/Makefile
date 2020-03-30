@@ -37,7 +37,6 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../chessengine.c \
 ../u8g_bitmap.c \
 ../u8g_circle.c \
 ../u8g_clip.c \
@@ -90,7 +89,6 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-chessengine.o \
 u8g_bitmap.o \
 u8g_circle.o \
 u8g_clip.o \
@@ -136,7 +134,6 @@ u8g_u8toa.o \
 u8g_virtual_screen.o
 
 OBJS_AS_ARGS +=  \
-chessengine.o \
 u8g_bitmap.o \
 u8g_circle.o \
 u8g_clip.o \
@@ -182,7 +179,6 @@ u8g_u8toa.o \
 u8g_virtual_screen.o
 
 C_DEPS +=  \
-chessengine.d \
 u8g_bitmap.d \
 u8g_circle.d \
 u8g_clip.d \
@@ -228,7 +224,6 @@ u8g_u8toa.d \
 u8g_virtual_screen.d
 
 C_DEPS_AS_ARGS +=  \
-chessengine.d \
 u8g_bitmap.d \
 u8g_circle.d \
 u8g_clip.d \
@@ -287,13 +282,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-./chessengine.o: .././chessengine.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : 5.4.0
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DF_CPU=16000000UL  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega1281 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega1281" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
 ./u8g_bitmap.o: .././u8g_bitmap.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0

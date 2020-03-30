@@ -212,4 +212,19 @@ void lcd_puthex( uint8_t x )
     lcd_putnibble( x & 0x0f );
 }
 #endif
+
+
+void lcd_display_update(void)
+{
+	char string[20];
+	int p=timer_get_stepper_speed();
+	sprintf(string,"Speed: %d",p);
+	display_puts(string);
+	
+	p=timer_get_pen_pressure();
+	sprintf(string,"Pressure: %d",p);
+	display_puts(string);
+
+	
+}
 #endif //#ifdef MACHINE_CAKE

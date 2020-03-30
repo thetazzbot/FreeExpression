@@ -55,7 +55,6 @@ void dial_poll( void )
 {
 	unsigned char i;
 	static unsigned char  queued = 0;
-	char string[40];
     
 	// records ADC readings from 2 or 3 ADC inputs on a round robin basis 	
     dial_adc[channel] = ADCH;
@@ -75,9 +74,9 @@ void dial_poll( void )
 		
 	if(pvars[DIAL_SPEED] != (i=dial_setting( DIAL_SPEED))) 
 	{
-		sprintf(string,"Dial speed: %d\r",i);
-		display_puts( string );
-		beep();
+		//sprintf(string,"Dial speed: %d\r",i);
+		//display_puts( string );
+		//beep();
 		pvars[DIAL_SPEED]=i;
 		timer_set_stepper_speed(i);		
 		keypadSet_Speed_state( );	// so that the +/- keys follow the speed settings
@@ -86,9 +85,9 @@ void dial_poll( void )
 	
 	if(pvars[DIAL_PRESSURE] != (i=dial_setting( DIAL_PRESSURE )))
 	{
-		sprintf(string,"Dial pressure: %d\r",i);
-		display_puts( string );
-		beep();
+		//sprintf(string,"Dial pressure: %d\r",i);
+		//display_puts( string );
+		//beep();
 		pvars[DIAL_PRESSURE]=i;
 		timer_set_pen_pressure(i);
 		keypadSet_Pressure_state( );	// so that the +/- keys follow the Pressure settings
@@ -97,14 +96,12 @@ void dial_poll( void )
 #ifdef SIZE_WHEEL_IS_POTENTIOMETER
 	if(pvars[DIAL_SIZE] != (i=dial_setting( DIAL_SIZE ))) 
 	{
-		sprintf(string,"Dial size: %d\r",i);
-		display_puts( string );
-		beep();
+		//sprintf(string,"Dial size: %d\r",i);
+		//display_puts( string );
+		//beep();
 		pvars[DIAL_SIZE]=i;
 	}
 #endif
-	
-	
 
 }
 

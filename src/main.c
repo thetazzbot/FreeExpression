@@ -58,7 +58,7 @@ void setup(void)
 	
 	msleep(100);
 	
-	display_print(VERSION );
+	//display_print(VERSION);
 	
 	usb_puts("\f");
 	usb_puts(VERSION);
@@ -69,7 +69,7 @@ void setup(void)
 int main( void )
 {
 	setup();
-	
+	display_update();
     while( 1 )
     {
         cli_poll( ); // polls ready bytes from USB  and processes them
@@ -80,6 +80,8 @@ int main( void )
 			
 			dial_poll( );  // polls the dials and processes their state
 			keypad_poll( ); // polls the keypad and executes functions
+			//display_update();
+
 		}
 		if( flag_Hz )
 		{

@@ -44,6 +44,17 @@ void display_print(char *s)
 
 }
 
+void display_update(void)
+{
+#ifdef  MACHINE_CAKE
+	lcd_display_update();
+#endif
+#ifdef  MACHINE_EXPRESSION
+	oled_display_update();
+#endif
+	
+	
+}
 
 
 

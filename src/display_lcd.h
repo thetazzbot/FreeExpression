@@ -30,7 +30,7 @@ extern FILE lcd;
 void lcd_init( void );
 void lcd_position( unsigned char row, unsigned char col);		// 0 based row
 int lcd_putchar( char c ,FILE *stream);
-
+void lcd_display_update(void); 
 void lcd_puthex( uint8_t x );
 
 #endif

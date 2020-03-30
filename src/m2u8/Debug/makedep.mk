@@ -2,8 +2,6 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-chessengine.c
-
 u8g_bitmap.c
 
 u8g_circle.c
