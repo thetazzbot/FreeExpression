@@ -2,7 +2,7 @@
 
 ----------
 
-**IMPORTANT: REPROGRAMMING THE CPU WILL PERMANENTLY ERASE YOUR ORIGINAL FIRMWARE
+**IMPORTANT: REPROGRAMMING THE CPU WILL PERMANENTLY ERASE YOUR ORIGINAL FIRMWARE.
 THERE IS NO WAY TO GET THE ORIGINAL FIRMWARE BACK OTHER THAN BUYING ANOTHER MACHINE.** 
 
 **About the Cricut** 
@@ -72,14 +72,11 @@ Use Inkscape to draw and send a file to the cutter.  Inkscape 0.91 has an export
 
 ## Multi-cut and media lock ##
 
-After the machine moves the media/carriage there is a time of about 1 minute (depending on speed setting) where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
+After the machine moves the media/carriage, there is a time of about 1 minute (depending on speed setting) where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
 
 # Command language #
 
-
 Currently supports HPGL -- HP Graphic Language. Cutting speed and pressure is NOT taken from the language input, only from keyboard and associated dials.
-
-After the machine moves the media/carriage there is a time of about 1 minute at speed 5 where the motors stay engaged and you can not move the media/carriage by hand. After this timeout the motors go into standby and you can move carriage and media by hand. This timeout is useful so that one can cut the same shape multiple times and not loose registration - for thick material multi-cut.
 
 Hope to add an option for GPGL (Graphtec)  in the future. 
 
